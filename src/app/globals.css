@@ -19,3 +19,17 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* 自定义分页指示器的样式 */
+.swiper-pagination-bullet {
+  background-color: rgba(255, 255, 255, 0.3); /* 未激活时设置为透明（透明度为 0.3） */
+  width: 10px; /* 设置点的大小 */
+  height: 10px;
+  opacity: 0.3; /* 未激活时透明 */
+  transition: opacity 0.3s ease; /* 过渡效果 */
+}
+
+.swiper-pagination-bullet-active {
+  background-color: blue !important; /* 激活时的颜色 */
+  opacity: 1 !important; /* 激活时完全不透明 */
+}
+
