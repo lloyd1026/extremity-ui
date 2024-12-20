@@ -2,6 +2,7 @@ import { FaRegEnvelope, FaCog } from 'react-icons/fa'; // 导入你需要的图�
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react'; // 用于控制下拉菜单显示
+import LogoutButton from '@/components/LogoutButton'; // 引入退出登录组件
 
 interface AdminHeaderProps {
   isSidebarOpen: boolean; // 传递侧边栏展开状态
@@ -69,6 +70,8 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
             >
               个人设置
             </Link>
+            {/* 退出登录按钮 */}
+            <LogoutButton />
           </div>
         </div>
       </div>
