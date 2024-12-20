@@ -1,0 +1,26 @@
+// // app/middleware.ts Next.js 13+ 中， 中间件 是保护页面路由的一种推荐方式
+
+// import { NextResponse } from 'next/server';
+// import { NextRequest } from 'next/server';
+
+// export function middleware(request: NextRequest) {
+//   console.log("Server端拦截");
+//   // 获取 token 或 session 信息（比如从 cookies 或 localStorage）
+
+//   const token = request.cookies.get('token');  // 或者从 headers 获取 token
+
+//   // 如果没有 token，重定向到登录页
+//   if (!token) {
+//     return NextResponse.redirect(new URL('/login', request.url));
+//   }
+
+//   // 如果有 token，则允许访问
+//   return NextResponse.next();
+// }
+
+// // 这里可以定义哪些路径需要路由保护
+// export const config = {
+//   matcher: [
+//     '/admin/:path*'
+//   ],  // 需要保护的路由
+// };

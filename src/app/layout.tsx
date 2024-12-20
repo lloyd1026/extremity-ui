@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
 // 这个是Next.js13+ 使用App Router时的一个全局布局文件，定义整个应用的全局布局结构和配置
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +28,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header style={{padding: '20px', backgroundColor: '#f4f4f4'}}>
-          <h1>Welcome to Next.js + TypeScript</h1>
-        </header>
-      
-        {children} {/* 渲染页面内容 (HelloPage 组件) */}
+        {/* 引入全局的 Header */}
+
+        {/* 渲染页面内容 */}
+        {children} {/* 渲染页面内容 */}
       </body>
     </html>
   );
