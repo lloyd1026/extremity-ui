@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import Image from 'next/image';
+import request from '@/utils/request';
 
 interface User {
   idUser: number;
@@ -24,7 +25,9 @@ const UserList = () => {
   const fetchUsers = async (roleIds: string, page: number) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8080/extremity/api/admin/user/get-by-role-ids?ids=${roleIds}`, {
+      // const response = await axios.get(`http://localhost:8080/extremity/api/admin/user/get-by-role-ids?ids=${roleIds}`, {
+      const response = await request.get(`admin/user/get-by-role-ids`,{
+        params: { ids: roleIds },  // 使用 params 来传递查询参数
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -117,21 +120,23 @@ const UserList = () => {
       <div className="space-y-4">
         {userList.map(user => (
           <div key={user.idUser} className="flex items-center p-6 border border-gray-300 rounded-xl shadow-sm hover:shadow-lg hover:scale-105 hover:z-10 transition-all duration-300">
-            <img
+            <Image
               src={user.avatarUrl || '/images/default-avatar.jpg'}
               alt="Avatar"
+              width={48}   // 指定宽度
+              height={48}  // 指定高度
               className="w-16 h-16 rounded-full mr-6"
             />
-            <div className="flex-1">
+
+            <div className="flex flex-row space-x-2">
               <h4 className="text-lg font-semibold">{user.nickname}</h4>
               <p className="text-sm text-gray-600">{user.account}</p>
-            </div>
-            <div className="text-sm text-gray-700 flex flex-col space-y-2">
               <p><strong>Email:</strong> {user.email}</p>
               <p><strong>电话:</strong> {user.phone || '暂无'}</p>
               <p><strong>签名:</strong> {user.signature || '暂无'}</p>
             </div>
-            <div className="flex space-x-4 ml-6">
+            
+            <div className="flex space-x-4 mr-10">
               <button
                 onClick={() => handleEdit(user.idUser)}
                 className="bg-blue-500 text-white px-6 py-3 rounded-xl shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transform transition-all duration-200"
