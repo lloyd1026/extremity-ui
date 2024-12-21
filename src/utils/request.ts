@@ -37,33 +37,52 @@ instance.interceptors.request.use(
   
 
 instance.interceptors.response.use(
-  response => response,
-  async error => {
-    const originalRequest = error.config;
-    if (error.response && error.response.data && error.response.data.code === "401" && !originalRequest._retry) {
-      // 如果token过期，尝试使用refreshToken刷新token
-      originalRequest._retry = true;
+  async (response) => {
+    // 处理服务器返回的数据，检查是否是401状态
+    console.log("进来了")
+    console.log(response.data)
+    if (response.data && response.data.code === 401) {
+      console.log('错误信息:', response.data.message);
+      console.log("Token 过期了");
+      // 获取 refreshToken
+      const refreshToken = getRefreshToken();
 
       try {
-        const refreshToken = getRefreshToken();
-        const response = await axios.post('/refresh-token', { refreshToken });
-        if (response.data && response.data.success) {
-          const {token, refreshToken} = response.data.data; // 正确的解构
-          saveToken(token);
-          saveRefreshToken(refreshToken);
-          originalRequest.headers['Authorization'] = `Bearer ${token}`;
-          return axios(originalRequest);
-        }
-      }
+        // 请求刷新token
+        const refreshResponse = await axios.post(response.config.baseURL+'/auth/refresh-token', { refreshToken });
 
-      catch (refreshError) {
+        if (refreshResponse.data && refreshResponse.data.success) {
+          console.log("刷新token成功");
+
+          const { token, refreshToken: newRefreshToken } = refreshResponse.data.data; // 正确的解构
+          
+          // 保存新的 token 和 refreshToken
+          saveToken(token);
+          saveRefreshToken(newRefreshToken);
+
+          // 更新请求头的 Authorization
+          response.config.headers['Authorization'] = `Bearer ${token}`;
+
+          // 重新发送原始请求
+          return axios(response.config);
+        } else {
+          throw new Error("刷新token失败");
+        }
+      } catch (refreshError) {
+        console.log("刷新失败", refreshError);
+        
+        // 清除本地存储的token和refreshToken
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
+
         const errorMessage = (refreshError as Error).message;
         return Promise.reject(new UnAuthenticatedError(errorMessage));
       }
-
     }
+    // 返回正常响应
+    return response; 
+  },
+  error => {
     return Promise.reject(error);
   }
 );
