@@ -4,8 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation'; // 导入 useRouter 进行页面跳转
 import '../globals.css'; // 导入全局样式
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { request } from './utils/request';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
@@ -56,9 +55,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   };
   return (
     <>
-      {/* 这里是 Root Layout 的 HTML 和 Body 标签 */}
-      <html lang="en">
-        <body>
         <div className="relative">
           <Disclosure as="nav" className="bg-gray-800">
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -177,8 +173,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <main>{children}</main>
             
           </div>
-        </body>
-      </html>
     </>
   );
 };

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { request } from '@/app/frontend/utils/request';
+import { request } from '@/utils/request';
 
 const register = () => {
   const [email, setUsername] = useState('');
