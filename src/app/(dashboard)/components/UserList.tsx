@@ -1,97 +1,70 @@
 "use client";
-import { useState, useEffect } from 'react'; // 命名导出 需要使用 {} 来指定需要导入的具体内容|| react提供的两个hook
-import Link from 'next/link'; // 用来实现路由跳转
-import axios from 'axios';  // 默认导出
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface User {
-  id: number;
+  idUser: number;
   account: string;
   nickname: string;
-  sex: string;
-  avatar_url: string;
+  avatarUrl: string;
   email: string;
-  phone: string;
-  status: string;
-  created_time: string;
-  updated_time: string;
-  signature: string;
-  last_login_time: string;
-  last_online_time: string;
-  bg_img_url: string;
+  phone?: string;
+  signature?: string;
 }
 
 const UserList = () => {
-  const [userList, setUserList] = useState<User[]>([]); // 初始为一个空数组
-  const [loading, setLoading] = useState<boolean>(true); // 用于表示数据是否正在加载
-  const [error, setError] = useState<string | null>(null); // 用于捕获请求错误
+  const [userList, setUserList] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedRoleId, setSelectedRoleId] = useState<string>('1');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const usersPerPage = 10;
 
-  // 使用 useEffect 来进行 API 请求,hook
+  const fetchUsers = async (roleIds: string, page: number) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:8080/extremity/api/admin/user/get-by-role-ids?ids=${roleIds}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (response.data.success && Array.isArray(response.data.data[selectedRoleId])) {
+        const users = response.data.data[selectedRoleId];
+        setTotalUsers(users.length);
+        const usersToShow = users.slice((page - 1) * usersPerPage, page * usersPerPage);
+        setUserList(usersToShow);
+      } else {
+        setUserList([]);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setError('无法加载用户数据');
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // const fetchUsers = async () => {
-    //   try {
-    //     const response = await axios.get('http://localhost:5000/api/users');
-    //     setUserList(response.data); // 假设返回的数据是一个用户数组
-    //     setLoading(false); // 请求成功后设置 loading 为 false
-    //   } catch (error) {
-    //     setError('无法加载用户数据'); // 错误处理
-    //     setLoading(false); // 请求失败后设置 loading 为 false
-    //   }
-    // };
+    fetchUsers(selectedRoleId, currentPage);
+  }, [selectedRoleId, currentPage]);
 
-    // fetchUsers();
+  const handleRoleChange = (roleId: string) => {
+    setSelectedRoleId(roleId);
+    setCurrentPage(1);
+  };
 
-    // 这里直接使用模拟的 JSON 数据
-    const simulatedData: User[] = [
-      {
-        id: 1,
-        account: 'admin',
-        nickname: '超级管理员',
-        sex: '0',
-        avatar_url: '/images/1.jpg',
-        email: 'admin@example.com',
-        phone: '12345678901',
-        status: '1',
-        created_time: '2024-01-01 12:00:00',
-        updated_time: '2024-01-01 12:00:00',
-        signature: '欢迎使用系统',
-        last_login_time: '2024-01-01 12:00:00',
-        last_online_time: '2024-01-01 12:00:00',
-        bg_img_url: '/default-bg.png',
-      },
-      {
-        id: 2,
-        account: 'user1',
-        nickname: '用户1',
-        sex: '1',
-        avatar_url: '/images/default-avatar.jpg',
-        email: 'user1@example.com',
-        phone: '12345678902',
-        status: '1',
-        created_time: '2024-01-02 12:00:00',
-        updated_time: '2024-01-02 12:00:00',
-        signature: '我是用户1',
-        last_login_time: '2024-01-02 12:00:00',
-        last_online_time: '2024-01-02 12:00:00',
-        bg_img_url: '/default-bg.png',
-      },
-      // 你可以继续添加其他用户数据
-    ];
-    // 模拟成功加载数据
-    setUserList(simulatedData);
-    setLoading(false);
-
-  }, []); // 只在组件首次渲染时执行一次
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleEdit = (id: number) => {
-    // 可以添加编辑用户的逻辑
     console.log(`Edit user with id ${id}`);
   };
 
   const handleDelete = (id: number) => {
-    // 删除用户的逻辑，可以在前端删除，或者发送删除请求到后端
-    setUserList(userList.filter(user => user.id !== id));
-    // 你可以在这里调用后端删除 API 来同步删除操作
-    // axios.delete(`http://localhost:5000/api/users/${id}`);
+    setUserList(userList.filter(user => user.idUser !== id));
   };
 
   if (loading) {
@@ -102,38 +75,99 @@ const UserList = () => {
     return <div>{error}</div>;
   }
 
+  const totalPages = Math.ceil(totalUsers / usersPerPage);
+
   return (
     <div>
       <h3>团队管理员 管理</h3>
-      <table className="table-auto w-full border-collapse border border-gray-300">
-        <thead>
-          <tr>
-            <th className="px-4 py-2">头像</th>
-            <th className="px-4 py-2">用户名</th>
-            <th className="px-4 py-2">真实姓名</th>
-            <th className="px-4 py-2">邮箱</th>
-            <th className="px-4 py-2">电话</th>
-            <th className="px-4 py-2">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {userList.map(user => (
-            <tr key={user.id}>
-            <td className="px-4 py-2">
-              <img src={user.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full" />
-            </td>
-            <td className="px-4 py-2">{user.nickname}</td>
-            <td className="px-4 py-2">{user.account}</td>
-            <td className="px-4 py-2">{user.email}</td>
-            <td className="px-4 py-2">{user.phone}</td>
-            <td className="px-4 py-2">
-              <button onClick={() => handleEdit(user.id)} className="bg-blue-500 text-white px-4 py-2 rounded">编辑</button>
-              <button onClick={() => handleDelete(user.id)} className="bg-red-500 text-white px-4 py-2 rounded ml-2">删除</button>
-            </td>
-          </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <div className="mb-4">
+        <label htmlFor="role-select" className="mr-2">选择角色:</label>
+        <div className="relative flex space-x-4 pb-4 overflow-x-auto w-full max-w-full">
+          {/* 角色按钮 */}
+          <button
+            onClick={() => handleRoleChange('1')}
+            className={`px-6 py-3 rounded-lg ${selectedRoleId === '1' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
+          >
+            超级管理员
+          </button>
+          <button
+            onClick={() => handleRoleChange('2')}
+            className={`px-6 py-3 rounded-lg ${selectedRoleId === '2' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
+          >
+            团队管理员
+          </button>
+          <button
+            onClick={() => handleRoleChange('3')}
+            className={`px-6 py-3 rounded-lg ${selectedRoleId === '3' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
+          >
+            团队成员
+          </button>
+          <button
+            onClick={() => handleRoleChange('4')}
+            className={`px-6 py-3 rounded-lg ${selectedRoleId === '4' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
+          >
+            普通用户
+          </button>
+          {/* 底部的滑动框 */}
+          {/* <div className={`absolute bottom-0 left-0 h-1 w-1/4 bg-purple-500 transition-transform duration-300 ${selectedRoleId === '1' ? 'transform translate-x-0' : selectedRoleId === '2' ? 'transform translate-x-1/4' : selectedRoleId === '3' ? 'transform translate-x-2/4' : 'transform translate-x-3/4'}`} /> */}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {userList.map(user => (
+          <div key={user.idUser} className="flex items-center p-6 border border-gray-300 rounded-xl shadow-sm hover:shadow-lg hover:scale-105 hover:z-10 transition-all duration-300">
+            <img
+              src={user.avatarUrl || '/images/default-avatar.jpg'}
+              alt="Avatar"
+              className="w-16 h-16 rounded-full mr-6"
+            />
+            <div className="flex-1">
+              <h4 className="text-lg font-semibold">{user.nickname}</h4>
+              <p className="text-sm text-gray-600">{user.account}</p>
+            </div>
+            <div className="text-sm text-gray-700 flex flex-col space-y-2">
+              <p><strong>Email:</strong> {user.email}</p>
+              <p><strong>电话:</strong> {user.phone || '暂无'}</p>
+              <p><strong>签名:</strong> {user.signature || '暂无'}</p>
+            </div>
+            <div className="flex space-x-4 ml-6">
+              <button
+                onClick={() => handleEdit(user.idUser)}
+                className="bg-blue-500 text-white px-6 py-3 rounded-xl shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transform transition-all duration-200"
+              >
+                编辑
+              </button>
+              <button
+                onClick={() => handleDelete(user.idUser)}
+                className="bg-red-500 text-white px-6 py-3 rounded-xl shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transform transition-all duration-200"
+              >
+                删除
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-l-md hover:bg-gray-400 disabled:opacity-50"
+        >
+          上一页
+        </button>
+        <span className="px-4 py-2 text-gray-700">
+          第 {currentPage} 页 / 共 {totalPages} 页
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-r-md hover:bg-gray-400 disabled:opacity-50"
+        >
+          下一页
+        </button>
+      </div>
     </div>
   );
 };

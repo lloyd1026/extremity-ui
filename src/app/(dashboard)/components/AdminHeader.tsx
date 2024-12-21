@@ -2,6 +2,7 @@ import { FaRegEnvelope, FaCog } from 'react-icons/fa'; // 导入你需要的图�
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react'; // 用于控制下拉菜单显示
+import LogoutButton from '@/app/(dashboard)/components/LogoutButton'; // 引入退出登录组件
 
 interface AdminHeaderProps {
   isSidebarOpen: boolean; // 传递侧边栏展开状态
@@ -55,7 +56,7 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
           <div
             className={`absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-2 overflow-hidden ${
               isDropdownOpen ? 'translate-y-0 opacity-100' : 'translate-y-[-10px] opacity-0'
-            } transition-all duration-300 ease-in-out`}
+            } transition-all duration-300 ease-in-out z-20`} // 提高 Z 层级
           >
             <Link
               href="/login"
@@ -69,6 +70,8 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
             >
               个人设置
             </Link>
+            {/* 退出登录按钮 */}
+            <LogoutButton />
           </div>
         </div>
       </div>

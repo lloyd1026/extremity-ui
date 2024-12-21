@@ -12,7 +12,7 @@ const LoginPage = () => {
   const handleLogin = async () => {
     // 在这里模拟登录验证
     const response = await request.post(`/auth/login`,{account,password})
-    if (response.success) {
+    if (response.data.success) {
       localStorage.setItem('isLoggedIn', 'true'); // 登录成功，设置登录状态
       const user: User = {
         token: response.data.token,
