@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { request } from '@/utils/request';
+import request from "@/utils/request";
 
 const register = () => {
   const [email, setUsername] = useState('');
@@ -22,9 +22,9 @@ const register = () => {
 
     // 如果有验证码，可以继续注册逻辑
     const response = await request.post('auth/register', { email, password, code });
-    if(response.success){
+    if(response.data.success){
       alert('注册成功');
-      router.push('/login'); // 登录成功后跳转到目标页面
+      router.push('/frontend/login'); // 登录成功后跳转到目标页面
     }
   };
 
@@ -36,8 +36,11 @@ const register = () => {
   };
   const handleSendCode = async () => {
     // 发送验证码的逻辑（通常是向后端请求验证码）
-    const response = await request.get(`auth/get-email-code`,{email})
-    if(response.success){
+    const response = await request.get('auth/get-email-code', {
+      params: { email } // 将 email 放到 params 中
+    });
+    
+    if(response.data.success){
       setIsCodeSent(true);
     }
      // 模拟验证码已发送

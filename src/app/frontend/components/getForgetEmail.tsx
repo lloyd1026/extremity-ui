@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { request } from '@/utils/request';
+import request from "@/utils/request";
 
 const getForgetEmail = () => {
   const [email, setUsername] = useState('');
@@ -13,7 +13,8 @@ const getForgetEmail = () => {
     e.preventDefault(); // 防止表单提交
 
     // 如果有验证码，可以继续注册逻辑
-    const response = await request.get('auth/get-forget-password-email',{email});
+    const response = await request.get('auth/get-forget-password-email',{
+      params: { email } })// 将 email 放到 params 中);
     if(response.data.success){
         setIsEmailSent(true)
         alert('邮件发送成功');

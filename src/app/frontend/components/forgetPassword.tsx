@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { request } from '@/utils/request';
+import request from "@/utils/request";
 
 const forgetPassword = () => {
   const [password, setPassword] = useState('');
