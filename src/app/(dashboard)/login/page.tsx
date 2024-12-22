@@ -34,7 +34,7 @@ export default function Login() {
         // 确保在客户端环境下才执行路由跳转
         console.log("login success");
         
-        router.push('/admin');
+        router.push('/admin/users');
       } else {
         alert('登录失败：' + data.message); // 如果登录失败，显示错误消息
       }

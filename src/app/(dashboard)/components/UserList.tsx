@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import request from '@/utils/request';
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import request from "@/utils/request";
+import AddUser from "@/app/(dashboard)/components/AddUser";
+import RoleSelector from "@/app/(dashboard)/components/RoleSelector";
 
 interface User {
   idUser: number;
@@ -17,19 +19,20 @@ const UserList = () => {
   const [userList, setUserList] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedRoleId, setSelectedRoleId] = useState<string>('1');
+  const [selectedRoleId, setSelectedRoleId] = useState<string>("1");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const usersPerPage = 10;
 
+  // 获取用户数据
   const fetchUsers = async (roleIds: string, page: number) => {
     setLoading(true);
     try {
-      // const response = await axios.get(`http://localhost:8080/extremity/api/admin/user/get-by-role-ids?ids=${roleIds}`, {
-      const response = await request.get(`admin/user/get-by-role-ids`,{
-        params: { ids: roleIds },  // 使用 params 来传递查询参数
+      const response = await request.get("admin/user/get-by-role-ids", {
+        params: { ids: roleIds },
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
@@ -44,31 +47,39 @@ const UserList = () => {
       setLoading(false);
     } catch (error) {
       console.log(error);
-      setError('无法加载用户数据');
+      setError("无法加载用户数据");
       setLoading(false);
     }
   };
 
+  // 调用 fetchUsers
   useEffect(() => {
+    console.log("当前role Id:" + selectedRoleId);
     fetchUsers(selectedRoleId, currentPage);
   }, [selectedRoleId, currentPage]);
 
+  // 编辑角色
   const handleRoleChange = (roleId: string) => {
     setSelectedRoleId(roleId);
     setCurrentPage(1);
   };
 
+  // 换页
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleEdit = (id: number) => {
-    console.log(`Edit user with id ${id}`);
+  const handleEdit = (userId: number) => {
+    // 编辑用户逻辑
+    console.log("编辑用户:", userId);
   };
 
-  const handleDelete = (id: number) => {
-    setUserList(userList.filter(user => user.idUser !== id));
+  const handleDelete = (userId: number) => {
+    // 删除用户逻辑
+    console.log("删除用户:", userId);
   };
+
+  const totalPages = Math.ceil(totalUsers / usersPerPage);
 
   if (loading) {
     return <div>加载中...</div>;
@@ -78,74 +89,75 @@ const UserList = () => {
     return <div>{error}</div>;
   }
 
-  const totalPages = Math.ceil(totalUsers / usersPerPage);
-
   return (
     <div>
-      <h3>团队管理员 管理</h3>
+      <h3 className="text-xl font-semibold mb-6">团队管理员 管理</h3>
 
-      <div className="mb-4">
-        <label htmlFor="role-select" className="mr-2">选择角色:</label>
-        <div className="relative flex space-x-4 pb-4 overflow-x-auto w-full max-w-full">
-          {/* 角色按钮 */}
-          <button
-            onClick={() => handleRoleChange('1')}
-            className={`px-6 py-3 rounded-lg ${selectedRoleId === '1' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
-          >
-            超级管理员
-          </button>
-          <button
-            onClick={() => handleRoleChange('2')}
-            className={`px-6 py-3 rounded-lg ${selectedRoleId === '2' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
-          >
-            团队管理员
-          </button>
-          <button
-            onClick={() => handleRoleChange('3')}
-            className={`px-6 py-3 rounded-lg ${selectedRoleId === '3' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
-          >
-            团队成员
-          </button>
-          <button
-            onClick={() => handleRoleChange('4')}
-            className={`px-6 py-3 rounded-lg ${selectedRoleId === '4' ? 'bg-purple-300 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-purple-400 transition-colors duration-300`}
-          >
-            普通用户
-          </button>
-          {/* 底部的滑动框 */}
-          {/* <div className={`absolute bottom-0 left-0 h-1 w-1/4 bg-purple-500 transition-transform duration-300 ${selectedRoleId === '1' ? 'transform translate-x-0' : selectedRoleId === '2' ? 'transform translate-x-1/4' : selectedRoleId === '3' ? 'transform translate-x-2/4' : 'transform translate-x-3/4'}`} /> */}
-        </div>
+      {/* 角色选择与新增按钮 */}
+      <div className="mb-4 flex items-center space-x-4">
+        <label htmlFor="roleSelect" className="text-gray-700 font-medium">
+          选择角色:
+        </label>
+
+        <RoleSelector selectedRoleId={selectedRoleId} onRoleChange={handleRoleChange} />
+
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="px-4 py-2 bg-purple-300 text-white rounded-md hover:bg-purple-400 transition-all"
+        >
+          创建账号
+        </button>
       </div>
 
+      {/* 新增用户模态框 */}
+      <AddUser isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+
+      {/* 用户列表 */}
       <div className="space-y-4">
-        {userList.map(user => (
-          <div key={user.idUser} className="flex items-center p-6 border border-gray-300 rounded-xl shadow-sm hover:shadow-lg hover:scale-105 hover:z-10 transition-all duration-300">
+        {userList.map((user) => (
+          <div
+            key={user.idUser}
+            className="flex items-center justify-between p-4 border border-gray-300 rounded-xl shadow-sm hover:shadow-lg hover:scale-105 hover:z-10 transition-all duration-300"
+          >
+            {/* 头像 */}
             <Image
-              src={user.avatarUrl || '/images/default-avatar.jpg'}
+              src={user.avatarUrl || "/images/default-avatar.jpg"}
               alt="Avatar"
-              width={48}   // 指定宽度
-              height={48}  // 指定高度
-              className="w-16 h-16 rounded-full mr-6"
+              width={48}
+              height={48}
+              className="w-12 h-12 rounded-full mr-4"
             />
 
-            <div className="flex flex-row space-x-2">
-              <h4 className="text-lg font-semibold">{user.nickname}</h4>
-              <p className="text-sm text-gray-600">{user.account}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>电话:</strong> {user.phone || '暂无'}</p>
-              <p><strong>签名:</strong> {user.signature || '暂无'}</p>
+            {/* 用户信息 */}
+            <div className="flex-1 flex items-center space-x-6">
+              <p className="text-sm text-gray-800">
+                <strong>昵称:</strong> {user.nickname}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>账号:</strong> {user.account}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Email:</strong> {user.email}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>电话:</strong> {user.phone || "暂无"}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>签名:</strong> {user.signature || "暂无"}
+              </p>
             </div>
-            
-            <div className="flex space-x-4 mr-10">
+
+            {/* 操作按钮 */}
+            <div className="flex space-x-4">
               <button
                 onClick={() => handleEdit(user.idUser)}
-                className="bg-blue-500 text-white px-6 py-3 rounded-xl shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transform transition-all duration-200"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transform transition-all duration-200"
               >
                 编辑
               </button>
               <button
                 onClick={() => handleDelete(user.idUser)}
-                className="bg-red-500 text-white px-6 py-3 rounded-xl shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transform transition-all duration-200"
+                className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transform transition-all duration-200"
               >
                 删除
               </button>
@@ -154,6 +166,7 @@ const UserList = () => {
         ))}
       </div>
 
+      {/* 分页 */}
       <div className="flex justify-center mt-6">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
