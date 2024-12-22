@@ -40,16 +40,16 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
 
     // 必填字段验证
     if (!formData.account) {
-      newErrors.account = "账号是必填的";
+      newErrors.account = "account is required";
     }
     if (!formData.nickname) {
-      newErrors.nickname = "昵称是必填的";
+      newErrors.nickname = "nickname is required";
     }
     if (!formData.password) {
-      newErrors.password = "密码是必填的";
+      newErrors.password = "password is required";
     }
     if (!formData.email) {
-      newErrors.email = "邮箱是必填的";
+      newErrors.email = "email is required";
     }
 
     setErrors(newErrors);
@@ -73,12 +73,12 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // 从本地存储中获取 token
         },
       });
-      console.log(result);
-      if (result.success) {
+
+      if (result.data.success) {
         alert("用户创建成功");
         onClose(); // 关闭模态框
       } else {
-        alert(result.message || "用户创建失败");
+        alert(result.data.message || "用户创建失败");
       }
     } catch (error) {
       console.error("创建用户时发生错误:", error);
@@ -91,8 +91,8 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 overflow-auto">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-h-[90vh] overflow-y-auto">
         <h3 className="text-xl font-semibold mb-4">创建新用户</h3>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -193,14 +193,14 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
           <div className="flex justify-end mt-4">
             <button
               type="submit"
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+              className="bg-purple-300 text-white px-6 py-2 rounded-md hover:bg-blue-600"
             >
               提交
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="ml-4 text-gray-500 px-6 py-2 rounded-md hover:bg-gray-200"
+              className="ml-4 bg-purple-300 text-white px-6 py-2 rounded-md hover:bg-gray-200"
             >
               取消
             </button>

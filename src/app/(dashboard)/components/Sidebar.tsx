@@ -1,6 +1,6 @@
 import { FaUsers, FaShieldAlt, FaClipboardList, FaCogs, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { Transition } from '@headlessui/react';
-import { useRouter, usePathname } from 'next/navigation';  // 用于布局和客户端导航
+import { usePathname } from 'next/navigation';  // 用于布局和客户端导航
 import Link from 'next/link'; // 导入 next/link 进行路由跳转
 
 interface SidebarProps {
@@ -81,7 +81,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       <button
         className={`fixed top-1/2 transform -translate-y-1/2 ${isOpen ? 'left-[250px]' : 'left-[10px]'} p-3 bg-gray-200 text-black rounded-full shadow-lg ${isOpen ? 'rotate-180' : 'rotate-0'} transition-transform duration-[400ms] ease-in-out`}
         onClick={toggleSidebar}
-        style={{ zIndex: 100 }}  // 确保按钮显示在最上面
+        style={{ zIndex: 20 }}  // 确保按钮显示在最上面
       >
         {isOpen ? (
           <FaArrowLeft size={24} className="transform rotate-180" />
