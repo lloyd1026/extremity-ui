@@ -24,7 +24,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigation = [
     { name: '主页', href: '/frontend', current: false },
     { name: '分类', href: '#', current: false },
-    {name : '在线编辑',href: '#',current:false},
+    { name : '在线编辑',href: '/frontend/markdownEditor',current:false},
   ]
 
 
