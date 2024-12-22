@@ -1,12 +1,20 @@
 'use client'; // 确保这是一个 Client Component
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PeopleNews from "@/app/frontend/components/peopleNews";
 import Login from '@/app/frontend/components/login';
 
 export default function PeopleNewsPage() {
   // 当前选中的组件，默认为 PeopleNews
   const [selectedComponent, setSelectedComponent] = useState('peopleNews');
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(JSON.parse(localStorage.getItem("isLoggedIn") || "false"));
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  
+  // 使用 useEffect 在组件加载时从 localStorage 获取登录状态
+  useEffect(() => {
+    const storedLoginStatus = localStorage.getItem('isLoggedIn');
+    if (storedLoginStatus) {
+      setIsLoggedIn(JSON.parse(storedLoginStatus)); // 更新状态
+    }
+  }, []);
 
   // 导航项
   const navItems = [

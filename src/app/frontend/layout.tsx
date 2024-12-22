@@ -4,11 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation'; // 导入 useRouter 进行页面跳转
 import '../globals.css'; // 导入全局样式
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import request from "@/utils/request";
+import { User } from './components/info';
+import config from '@/config/baseurl_config';
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
   const pathname = usePathname(); // 获取当前路径
+  const [user,setUser] = useState<User |null>(null);
+  const imageUrl =`${config.imageUrl}${user?.avatarUrl}`;
+  
+  const storedUser = localStorage.getItem("user");
+  if(storedUser==null){
+    return null
+  }
+  const parseuser:User = JSON.parse(storedUser);
 
   const navigation = [
     { name: '主页', href: '/frontend', current: false },
@@ -18,9 +29,18 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
 
   useEffect(() => {
+    const fetchUser = async()=>{
+      const response = await request.get(`/user/email`,{params:{email:parseuser.email}})
+      if(response.data.success){
+        setUser(response.data.data);
+      }
+    }
     const loginStatus = localStorage.getItem('isLoggedIn'); // 假设使用 localStorage 存储登录状态
     if (loginStatus === 'true') {
       setIsLoggedIn(true); // 用户已登录
+      fetchUser();
+      console.log(user?.avatarUrl);
+
     } else {
       setIsLoggedIn(false); // 用户未登录
     }
@@ -54,7 +74,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   };
   return (
-    <>
         <div className="relative">
           <Disclosure as="nav" className="bg-gray-800">
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -104,8 +123,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
                   <img
+                  
                     alt=""
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    src={imageUrl}
                     className="size-8 rounded-full"
                   />
                 </MenuButton>
@@ -173,7 +193,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <main>{children}</main>
             
           </div>
-    </>
   );
 };
 

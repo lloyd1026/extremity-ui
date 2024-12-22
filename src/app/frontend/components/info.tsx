@@ -1,6 +1,12 @@
 export interface User{
-    token:string
-    account:string
+    refreshToken:string;
+    token:string;
+    email:string;
+    account:string;
+    realName:string;
+    phone:string;
+    sex:string;
+    avatarUrl:string;
 }
 
 export interface articleDetails{

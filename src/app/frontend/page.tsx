@@ -1,10 +1,11 @@
 
 import React from 'react';
+import Article from './components/article';
 
 const HomePage = () => {
   return (
     <div>
-      这里是主页
+      <Article/>
     </div>
   );
 };

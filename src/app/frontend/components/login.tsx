@@ -1,7 +1,7 @@
 'use client'; // 确保这是一个 Client Component
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { request } from '@/utils/request';
+import request from "@/utils/request";
 import { User } from './info';
 
 const LoginPage = () => {
@@ -15,10 +15,15 @@ const LoginPage = () => {
     if (response.data.success) {
       localStorage.setItem('isLoggedIn', 'true'); // 登录成功，设置登录状态
       const user: User = {
-        token: response.data.token,
-        account: account, // 使用传入的账户值
+        refreshToken:response.data.data.refreshToken,
+        token: response.data.data.token,
+        email: account, // 使用传入的账户值
+        account:account.split('@')[0],
+        realName:"",
+        phone:"",
+        sex:"",
+        avatarUrl:"",
       };
-
       // 将 user 对象转换为字符串并保存到 localStorage
       localStorage.setItem('user', JSON.stringify(user)); 
       router.push('/frontend'); // 登录成功后跳转到目标页面
