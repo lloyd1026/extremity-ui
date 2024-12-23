@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import request from "@/utils/request";
-import RoleSelector from "@/app/(dashboard)/components/RoleSelector";
+import RoleSelector from "@/app/dashboard/components/RoleSelector";
 
 interface Role {
   idRole: number;

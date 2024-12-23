@@ -47,27 +47,27 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             <ul>
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/users')}`}>
                 <FaUsers className="mr-4 text-xl text-black" />
-                <Link href="/admin/users" className="text-lg text-black hover:text-purple-900">
+                <Link href="users" className="text-lg text-black hover:text-purple-900">
                   用户管理
                 </Link>
               </li>
               
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/permissions')}`}>
                 <FaShieldAlt className="mr-4 text-xl text-black" />
-                <Link href="/admin/permissions" className="text-lg text-black hover:text-purple-900">
+                <Link href="permissions" className="text-lg text-black hover:text-purple-900">
                   权限管理
                 </Link>
               </li>
 
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/content')}`}>
                 <FaClipboardList className="mr-4 text-xl text-black" />
-                <Link href="/admin/content" className="text-lg text-black hover:text-purple-900">
+                <Link href="content" className="text-lg text-black hover:text-purple-900">
                   内容管理
                 </Link>
               </li>
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/settings')}`}>
                 <FaCogs className="mr-4 text-xl text-black" />
-                <Link href="/admin/settings" className="text-lg text-black hover:text-purple-900">
+                <Link href="settings" className="text-lg text-black hover:text-purple-900">
                   系统设置
                 </Link>
               </li>

@@ -17,7 +17,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await request.post('auth/adminlogin', {
+      const response = await request.post('auth/login', {
           "account": email,
           "password": password 
         }, // 发送用户输入的邮箱和密码
@@ -31,7 +31,7 @@ export default function Login() {
         // 确保在客户端环境下才执行路由跳转
         console.log("login success");
         
-        router.push('/admin/users');
+        router.push('admin/users');
       } else {
         alert('登录失败：' + response.data.message); // 如果登录失败，显示错误消息
       }
