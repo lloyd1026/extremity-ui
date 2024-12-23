@@ -1,10 +1,10 @@
-export interface user {
+export interface userwithRoles {
   idUser: number;
   account: string;
   nickname: string;
-  // token: string;
   avatarUrl: string;
   refreshToken: string;
-  scope: Set<string>;
+  scope: Array<number>;
 }
-export default user;
+
+export default userwithRoles;

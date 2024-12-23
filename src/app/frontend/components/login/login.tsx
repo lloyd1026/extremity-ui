@@ -2,30 +2,16 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import request from "@/utils/request";
-import { User } from './info';
-
 const LoginPage = () => {
   const [account, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-
   const handleLogin = async () => {
     // 在这里模拟登录验证
     const response = await request.post(`/auth/login`,{account,password})
     if (response.data.success) {
-      localStorage.setItem('isLoggedIn', 'true'); // 登录成功，设置登录状态
-      const user: User = {
-        refreshToken:response.data.data.refreshToken,
-        token: response.data.data.token,
-        email: account, // 使用传入的账户值
-        account:account.split('@')[0],
-        realName:"",
-        phone:"",
-        sex:"",
-        avatarUrl:"",
-      };
-      // 将 user 对象转换为字符串并保存到 localStorage
-      localStorage.setItem('user', JSON.stringify(user)); 
+      localStorage.setItem('token',response.data.data.token);
+      localStorage.setItem('refreshToken',response.data.data.refreshToken);
       router.push('/frontend'); // 登录成功后跳转到目标页面
     } else {
       alert('登录失败');
@@ -37,7 +23,6 @@ const LoginPage = () => {
       handleLogin(); // 按下 Enter 键时触发登录事件
     }
   };
-
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">

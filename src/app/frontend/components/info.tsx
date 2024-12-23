@@ -1,6 +1,4 @@
 export interface User{
-    refreshToken:string;
-    token:string;
     email:string;
     account:string;
     realName:string;
@@ -25,5 +23,5 @@ export interface articleDetails{
     updated_time:string;
     article_perfect:string;
     article_status:string;
-    article_thumbs_up_count:number;
+    article_thumbs_u_count:number;
 }
