@@ -1,5 +1,5 @@
 import instance from "./request";
-const getuser = () => {
+const getuserwithRoles = () => {
     return instance.get("/auth/user");
 };
-export default getuser;
+export default getuserwithRoles;

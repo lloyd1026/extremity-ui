@@ -1,4 +1,4 @@
-import ForgetPassword from "@/app/frontend/components/getForgetEmail"
+import ForgetPassword from "@/app/frontend/components/login/getForgetEmail"
 
 const forgetPasswordPage = ()=>{
     return <div>

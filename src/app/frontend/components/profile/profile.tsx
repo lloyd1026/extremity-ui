@@ -1,25 +1,44 @@
-import config from '@/config/baseurl_config';
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
-import { Praise } from 'next/font/google';
+"use clients"
+import { PhotoIcon} from '@heroicons/react/24/solid';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import request from "@/utils/request";
-import { User } from './info';
+import { User } from '../info';
+import { useAuth } from '../auth/authcontext';
+import Loading from '../loading/loading';
+import config from '@/config/baseurl_config';
 
-const PeopleNews = () => {
+const Profile = () => {
   const [image, setImage] = useState<File | null>(null); // 存储选择的图片
   const [imagePreview, setImagePreview] = useState<string | null>(null); // 存储预览图片的URL
   const [account, setAccount] = useState<string>(''); // 存储姓名
   const [name, setName] = useState<string>(''); // 存储姓名
   const [gender, setGender] = useState<string>(''); // 存储性别
   const [phone, setPhone] = useState<string>(''); // 存储电话号码
-  const [user,setUser] = useState<User |null>(null);
-  const storedUser = localStorage.getItem("user");
+  const [user, setUser] = useState<User |null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const { auth } = useAuth();
 
-  if(storedUser==null){
-    return null
+  const fetchUser = async()=>{
+    try{
+          const response = await request.get(`/user/email`,{params:{email:auth?.account}})
+          if(response.data.success){
+            console.log(response.data.data)
+            setUser(response.data.data);
+          }
+    }
+    catch(error){
+      console.log(error);      
+      setUser(null);
+    }
   }
-  const parseuser:User = JSON.parse(storedUser);
-  // 处理图片选择
+
+  useEffect(()=>{
+    fetchUser();
+    console.log(config.imageUrl+user?.avatarUrl)
+    setIsMounted(true)
+  },[auth])
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -45,50 +64,51 @@ const PeopleNews = () => {
     formData.append('name', name); // 添加姓名到FormData
     formData.append('sex', gender); // 添加性别到FormData
     formData.append('phone', phone); // 添加电话号码到FormData
-    console.log(user)
+
     const response = await request.post('/user/upload-avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
 
+    
     if (response.data.success) {
       alert('添加成功');
     } else {
       alert('添加失败');
     }
   };
-  useEffect(()=>{
-    const fetchUser = async()=>{
-      const response = await request.get(`/user/email`,{params:{email:parseuser.email}})
-      if(response.data.success){
-        setUser(response.data.data);
-        if (response.data.data.avatarUrl) {
-          setImagePreview(`${config.imageUrl}${response.data.data.avatarUrl}`);
-        }
+
+  const currentImage = ()=>{
+    if(imagePreview===null){
+      if(user&&user.avatarUrl){
+        return `${config.imageUrl}${user?.avatarUrl}`;
       }
-      
+      return null;
+    }else{
+      return `${config.imageUrl}${imagePreview}`;
     }
-    fetchUser();
-  },[]);
+
+  }
   return (
-    <div className="max-w-xl mx-auto p-6">
-      {/* 头像部分 */}
+      (isMounted&&user!==null)?
+    (<div className="max-w-xl mx-auto p-6">
+
       <div className="col-span-full">
         <label htmlFor="photo" className="block text-sm font-medium text-gray-900">
           头像
         </label>
+
         <div className="mt-2 flex justify-center items-center gap-x-3">
-          {imagePreview ? (
-            <img
-              src={imagePreview}
+            <Image
+              src={currentImage() || "/images/default-avatar.jpg"}
               alt="Avatar Preview"
               className="h-24 w-24 rounded-full object-cover"
+              width={96}
+              height={96}
             />
-          ) : (
-            <UserCircleIcon aria-hidden="true" className="h-24 w-24 text-gray-300" />
-          )}
         </div>
+
       </div>
 
       {/* 上传文件部分 - 调整大小 */}
@@ -128,7 +148,7 @@ const PeopleNews = () => {
           type="text"
           id="account"
           name="account"
-          value={account||user?.account||""}
+          value={account||(user?.account)||""}
           onChange={(e) => setAccount(e.target.value)}
           className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="请输入您的用户名"
@@ -194,8 +214,11 @@ const PeopleNews = () => {
           保存
         </button>
       </div>
-    </div>
+    </div>):
+    (
+      <Loading/>
+    )
   );
 };
 
-export default PeopleNews;
+export default Profile;

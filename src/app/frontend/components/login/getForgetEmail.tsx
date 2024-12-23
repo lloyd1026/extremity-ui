@@ -1,13 +1,11 @@
 'use client'; // 确保这是一个 Client Component
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import request from "@/utils/request";
 
-const getForgetEmail = () => {
+const GetForgetEmail = () => {
   const [email, setUsername] = useState('');
   const [isEmailSent, setIsEmailSent] = useState(false); // 控制验证码是否已发送
-  const router = useRouter();
 
   const handleForget = async (e: React.FormEvent) => {
     e.preventDefault(); // 防止表单提交
@@ -79,4 +77,4 @@ const getForgetEmail = () => {
   );
 };
 
-export default getForgetEmail;
+export default GetForgetEmail;

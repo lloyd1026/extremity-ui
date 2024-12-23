@@ -1,4 +1,4 @@
-import Register from "@/app/frontend/components/register";
+import Register from "@/app/frontend/components/login/register";
 
 const registerPage = ()=>{
     return (

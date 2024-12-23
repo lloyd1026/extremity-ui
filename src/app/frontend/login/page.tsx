@@ -3,36 +3,31 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // 用来跳转页面
-import Login from '@/app/frontend/components/login'; // 导入登录组件
+import Login from '@/app/frontend/components/login/login'; // 导入登录组件
+import { useAuth } from '../components/auth/authcontext';
+import Loading from '../components/loading/loading';
 
 const HomePage: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
   const router = useRouter(); // 初始化router，用于页面跳转
-
+  const {auth} = useAuth();
+  const [mounted, setIsMounted] = useState(false);
   useEffect(() => {
-    const loginStatus = localStorage.getItem('isLoggedIn'); // 假设使用 localStorage 存储登录状态
-    if (loginStatus === 'true') {
-      setIsLoggedIn(true); // 用户已登录
-    } else {
-      setIsLoggedIn(false); // 用户未登录
+    if (auth!==undefined && auth!==null) {
+      console.log(auth)
+      console.log("应该跳转")
+      router.push('/frontend'); // 跳转到主页或其他页面
     }
-  }, []);
-
-  //如果用户已登录，跳转到其他页面（比如首页或者其他页面）
-  useEffect(() => {
-    if (isLoggedIn) {
-      router.push('/'); // 跳转到主页或其他页面
-    }
-  }, [isLoggedIn]);
+    setIsMounted(true)
+  }, [auth]);
 
   return (
-    <div>
-      {/* 如果未登录，显示登录组件 */}
-      {!isLoggedIn && 
-      <Login />}
-      {/* 如果已登录，显示相应的内容或者跳转 */}
-    </div>
+    mounted?
+    (<div>
+      {(auth === undefined)?
+      <Loading/>:<Login/>}
+    </div>)
+    :
+    (<Loading/>)
   );
 };
 
