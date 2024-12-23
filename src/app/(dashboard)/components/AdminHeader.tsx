@@ -3,13 +3,20 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react'; // 用于控制下拉菜单显示
 import LogoutButton from '@/app/(dashboard)/components/LogoutButton'; // 引入退出登录组件
+import { useRouter } from "next/navigation";
 
 interface AdminHeaderProps {
   isSidebarOpen: boolean; // 传递侧边栏展开状态
 }
 
 const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
+  const router = useRouter(); // 控制页面跳转
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 控制下拉菜单显示/隐藏
+
+  const handleNavigate = () => {
+    const state = {idUser: 6};
+    router.push(`/personal-settings?idUser=${state.idUser}`);
+  }
 
   return (
     <header
@@ -64,12 +71,13 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
             >
               账号切换
             </Link>
-            <Link
-              href="/personal-settings"
+
+            <button
+              onClick = {handleNavigate}
               className="block px-4 py-2 text-gray-700 hover:bg-indigo-100 rounded-lg"
             >
               个人设置
-            </Link>
+            </button>
             {/* 退出登录按钮 */}
             <LogoutButton />
           </div>

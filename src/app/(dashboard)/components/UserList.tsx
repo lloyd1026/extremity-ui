@@ -2,17 +2,17 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import request from "@/utils/request";
+import { useRouter } from "next/navigation";
 import AddUser from "@/app/(dashboard)/components/AddUser";
 import RoleSelector from "@/app/(dashboard)/components/RoleSelector";
+// import ShowUserInfo from "@/app/(dashboard)/components/ShowUserInfo";
 
 interface User {
   idUser: number;
-  account: string;
+  email: string;
   nickname: string;
   avatarUrl: string;
-  email: string;
-  phone?: string;
-  signature?: string;
+  status: string;
 }
 
 const UserList = () => {
@@ -24,6 +24,7 @@ const UserList = () => {
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const usersPerPage = 10;
+  const router = useRouter(); // 用于页面跳转
 
   // 获取用户数据
   const fetchUsers = async (roleIds: string, page: number) => {
@@ -69,14 +70,34 @@ const UserList = () => {
     setCurrentPage(page);
   };
 
-  const handleEdit = (userId: number) => {
-    // 编辑用户逻辑
-    console.log("编辑用户:", userId);
+  // 删除
+  const handleDelete = async (userId: number) => {
+    try {
+      // 调用删除用户 API
+      const response = await request.get("admin/user/delete-user", {
+        params: { idUser: userId },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
+      if (response.data.success) {
+        // 如果成功，从当前列表中移除该用户
+        setUserList((prevList) => prevList.filter((user) => user.idUser !== userId));
+        setTotalUsers((prevTotal) => prevTotal - 1);
+        alert("用户删除成功");
+      } else {
+        alert(`删除失败: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error("删除用户时出错:", error);
+      alert("删除用户时发生错误，请稍后再试");
+    }
   };
 
-  const handleDelete = (userId: number) => {
-    // 删除用户逻辑
-    console.log("删除用户:", userId);
+  // 页面跳转到用户信息详情页
+  const handleUserClick = (userId: number) => {
+    router.push(`/admin/users/${userId}`); // 跳转到用户详情页
   };
 
   const totalPages = Math.ceil(totalUsers / usersPerPage);
@@ -91,8 +112,6 @@ const UserList = () => {
 
   return (
     <div>
-      {/* <h3 className="text-xl font-semibold mb-6">团队管理员 管理</h3> */}
-
       {/* 角色选择与新增按钮 */}
       <div className="mb-4 flex items-center space-x-4">
         <label htmlFor="roleSelect" className="text-gray-700 font-medium">
@@ -105,7 +124,7 @@ const UserList = () => {
           onClick={() => setIsAddModalOpen(true)}
           className="px-4 py-2 bg-purple-300 text-white rounded-md hover:bg-purple-400 transition-all"
         >
-          创建账号
+          创建团队管理员账号
         </button>
       </div>
 
@@ -130,37 +149,38 @@ const UserList = () => {
 
             {/* 用户信息 */}
             <div className="flex-1 flex items-center space-x-6">
-              <p className="text-sm text-gray-800">
-                <strong>昵称:</strong> {user.nickname}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>账号:</strong> {user.account}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Email:</strong> {user.email}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>电话:</strong> {user.phone || "暂无"}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>签名:</strong> {user.signature || "暂无"}
-              </p>
+              <button
+                onClick={() => {
+                  handleUserClick(user.idUser);
+                }}
+                className="w-full text-left flex items-center space-x-6 p-4"
+              >
+                {/* 用户信息 */}
+                <p className="text-sm text-gray-600">
+                  <strong>ID:</strong> {user.idUser || "暂无"}
+                </p>
+                <p className="text-sm text-gray-800">
+                  <strong>昵称:</strong> {user.nickname}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Email:</strong> {user.email}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>状态:</strong> {user.status}
+                </p>
+              </button>
             </div>
 
             {/* 操作按钮 */}
             <div className="flex space-x-4">
-              <button
-                onClick={() => handleEdit(user.idUser)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transform transition-all duration-200"
-              >
-                编辑
-              </button>
-              <button
-                onClick={() => handleDelete(user.idUser)}
-                className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transform transition-all duration-200"
-              >
-                删除
-              </button>
+              {selectedRoleId !== "1" && (
+                <button
+                  onClick={() => handleDelete(user.idUser)}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transform transition-all duration-200"
+                >
+                  删除
+                </button>
+              )}
             </div>
           </div>
         ))}
