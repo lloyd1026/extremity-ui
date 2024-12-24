@@ -39,14 +39,14 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   async (response) => {
     // 处理服务器返回的数据，检查是否是401状态
-    console.log("进来了")
-    console.log(response.data)
+    // console.log(response.data)
     if (response.data && response.data.code === 401) {
-      console.log('错误信息:', response.data.message);
-      console.log("Token 过期了");
+      // console.log('错误信息:', response.data.message);
+      // console.log("Token 过期了");
       const refreshToken = getRefreshToken();
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('userInfo');
       try {
         // 请求刷新token
         const refreshResponse = await axios.post(response.config.baseURL+'auth/refresh-token', { "refreshToken":refreshToken });
@@ -66,14 +66,16 @@ instance.interceptors.response.use(
           // 重新发送原始请求
           return axios(response.config);
         } else {
-          throw new Error("刷新token失败");
+          return Promise.reject(new UnAuthenticatedError("刷新失败呗"));
         }
-      } catch (refreshError) {
-        console.log("刷新失败", refreshError);
-        // 清除本地存储的token和refreshToken
 
-        const errorMessage = (refreshError as Error).message;
-        return Promise.reject(new UnAuthenticatedError(errorMessage));
+      } catch (refreshError) {
+        if(refreshError instanceof UnAuthenticatedError){
+          const errorMessage = (refreshError as Error).message;
+          return Promise.reject(new UnAuthenticatedError(errorMessage));
+        }else{
+          return Promise.reject(refreshError)
+        }
       }
     }
     // 返回正常响应
