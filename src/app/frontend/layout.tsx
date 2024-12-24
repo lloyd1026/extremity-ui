@@ -44,7 +44,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     } else {
       setIsLoggedIn(false); // 用户未登录
     }
-  }, [pathname]);
+  }, [pathname,user?.avatarUrl]);
   function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(' ')
   }
