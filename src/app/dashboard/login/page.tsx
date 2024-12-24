@@ -30,8 +30,18 @@ export default function Login() {
 
         // 确保在客户端环境下才执行路由跳转
         console.log("login success");
-        
-        router.push('admin/users');
+        console.log("login role:" + response.data.message)
+        // 根据不同的角色跳转到不同的页面
+        switch (response.data.message) {
+          case '1':
+            router.push('/dashboard/admin/users');
+            break;
+          case '2':
+            router.push('/dashboard/team-admin');
+            break;
+          default:
+            alert('未知角色，无法跳转'); // 没什么用，不能保护
+        }
       } else {
         alert('登录失败：' + response.data.message); // 如果登录失败，显示错误消息
       }

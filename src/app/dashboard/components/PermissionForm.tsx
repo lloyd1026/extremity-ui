@@ -1,159 +1,108 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import request from "@/utils/request";
-import RoleSelector from "@/app/dashboard/components/RoleSelector";
 
-interface Role {
+interface UserRole {
+  idUser: number;
+  email: string;
   idRole: number;
-  name: string;
+  roleName: string;
+  createdTime: number;
+  activated: number;
+  avatarUrl: string;
+  nickName: string;
 }
 
-interface User {
-  idUser: number;
-  account: string;
-  nickname: string;
-  avatarUrl: string;
-  roles?: string[]; // 用户角色
+function formatTimestamp(timestamp: number): string {
+  return new Date(timestamp).toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
 const PermissionsManage = () => {
-  const [userList, setUserList] = useState<User[]>([]);
-  const [roleList, setRoleList] = useState<Role[]>([]); // 系统中所有角色
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedRoleId, setSelectedRoleId] = useState<string>("1");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [isActivatedFilter, setIsActivatedFilter] = useState<boolean>(false); // false: 未激活, true: 已激活
   const usersPerPage = 10;
 
-  // 获取系统中的所有角色
   const fetchRoles = async () => {
-    try {
-      const response = await request.get("admin/simple-roles", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (response.data.success) {
-        setRoleList(response.data.data);
-      }
-    } catch (error) {
-      console.log("无法加载角色列表:", error);
-    }
-  };
-
-  // 获取用户数据并加载角色
-  const fetchUsersWithRoles = async (roleIds: string, page: number) => {
     setLoading(true);
     try {
-      const response = await request.get("admin/user/get-by-role-ids", {
-        params: { ids: roleIds },
+      const endpoint = isActivatedFilter
+        ? "admin/user/get-activate-role" // 已激活 API
+        : "admin/user/get-deactivate-role"; // 未激活 API
+
+      const response = await request.get(endpoint, {
+        params: { idRole: 2 },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      if (response.data.success && Array.isArray(response.data.data[selectedRoleId])) {
-        const users = response.data.data[selectedRoleId];
-        setTotalUsers(users.length);
-
-        // 分页处理
-        const usersToShow = users.slice((page - 1) * usersPerPage, page * usersPerPage);
-
-        // 加载角色
-        const usersWithRoles = await Promise.all(
-          usersToShow.map(async (user: User) => {
-            const roles = await fetchUserRoles(user.idUser);
-            return { ...user, roles };
-          })
-        );
-
-        setUserList(usersWithRoles);
-      } else {
-        setUserList([]);
-      }
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setError("无法加载用户数据");
-      setLoading(false);
-    }
-  };
-
-  // 获取用户角色
-  const fetchUserRoles = async (userId: number) => {
-    try {
-      const response = await request.get(`admin/user/${userId}/role`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
       if (response.data.success) {
-        return response.data.data.map((role: { name: string }) => role.name);
+        const sortedData = response.data.data.sort(
+          (a: UserRole, b: UserRole) => b.createdTime - a.createdTime
+        );
+        setUserRoles(sortedData);
+      } else {
+        setError("无法加载数据");
       }
-      return [];
     } catch (error) {
-      console.log(`无法加载用户 ${userId} 的角色:`, error);
-      return [];
+      console.error(error);
+      setError("网络错误或服务器错误");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 增加或删除角色
-  const toggleUserRole = async (userId: number, roleId: number, hasRole: boolean) => {
+  const toggleActivationStatus = async (
+    userId: number,
+    roleId: number,
+    isActivated: number
+  ) => {
     try {
-      let result;
-      if (hasRole) {
-        result = await request.get("admin/user/revoke-role", {
-          params: { idUser: userId, idRole: roleId },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-      } else {
-        result = await request.get("admin/user/grant-role", {
-          params: { idUser: userId, idRole: roleId },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-      }
-  
+      const endpoint =
+        isActivated === 0
+          ? "admin/user/activate-role"
+          : "admin/user/deactivate-role";
+
+      const result = await request.get(endpoint, {
+        params: { idUser: userId, idRole: roleId },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
       if (result.data.success) {
-        alert(`role operate success: ${hasRole ? "revoke role" : "add role"}`);
-        if(result.data.message){
-          alert(result.data.message);
-        }
+        alert(result.data.message || "操作成功");
+        fetchRoles();
       } else {
-        alert(`role operate fail: ${result.data.message || "未知错误"}`);
+        alert(`操作失败: ${result.data.message || "未知错误"}`);
       }
-      
-      // 更新用户列表
-      fetchUsersWithRoles(selectedRoleId, currentPage);
-      } catch (error) {
-        console.log("无法更新用户角色:", error);
-        alert("角色操作失败: 网络或服务器错误");
-      }
+    } catch (error) {
+      console.error("操作失败:", error);
+      alert("网络错误或服务器错误");
+    }
   };
 
-  // 数据加载
   useEffect(() => {
     fetchRoles();
-    fetchUsersWithRoles(selectedRoleId, currentPage);
-  }, [selectedRoleId, currentPage]);
+  }, [isActivatedFilter]); // 监听激活状态的切换
 
-  // 编辑角色
-  const handleRoleChange = (roleId: string) => {
-    setSelectedRoleId(roleId);
-    setCurrentPage(1);
-  };
-
-  // 换页
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const totalPages = Math.ceil(totalUsers / usersPerPage);
+  const totalPages = Math.ceil(userRoles.length / usersPerPage);
 
   if (loading) {
     return <div>加载中...</div>;
@@ -163,67 +112,97 @@ const PermissionsManage = () => {
     return <div>{error}</div>;
   }
 
+  const currentPageData = userRoles.slice(
+    (currentPage - 1) * usersPerPage,
+    currentPage * usersPerPage
+  );
+
   return (
     <div>
-      {/* 角色选择 */}
-      <div className="mb-4 flex items-center space-x-4">
-        <label htmlFor="roleSelect" className="text-gray-700 font-medium">
-          选择角色:
-        </label>
-        <RoleSelector selectedRoleId={selectedRoleId} onRoleChange={handleRoleChange} />
+      {/* 左上角滑动按钮 */}
+      <div className="flex justify-start items-center mb-4">
+        <div className="relative">
+          {/* 滑动开关 */}
+          <label className="flex items-center cursor-pointer">
+            <div className="relative">
+              <input
+                type="checkbox"
+                checked={isActivatedFilter}
+                onChange={() => setIsActivatedFilter(!isActivatedFilter)}
+                className="sr-only" // 隐藏实际的 checkbox
+              />
+              {/* 开关背景 */}
+              <div
+                className={`block w-16 h-8 rounded-full transition-colors ${
+                  isActivatedFilter ? "bg-purple-300" : "bg-gray-300"
+                }`}
+              ></div>
+              {/* 滑块 */}
+              <div
+                className={`absolute top-0 left-0 w-8 h-8 bg-white rounded-full shadow-md transform transition-transform duration-1000 ${
+                  isActivatedFilter ? "translate-x-8" : "translate-x-0"
+                }`}
+              ></div>
+            </div>
+            {/* 标签 */}
+            <span className="ml-3 text-sm text-gray-700">
+              {isActivatedFilter ? "已激活" : "未激活"}
+            </span>
+          </label>
+        </div>
       </div>
 
-      {/* 用户列表 */}
       <div className="space-y-4">
-        {userList.map((user) => (
+        {currentPageData.map((user) => (
           <div
             key={user.idUser}
             className="flex items-center justify-between p-4 border border-gray-300 rounded-xl shadow-sm hover:shadow-lg hover:scale-105 hover:z-10 transition-all duration-300"
           >
             {/* 头像 */}
             <Image
-              src={user.avatarUrl || "/images/default-avatar.jpg"}
-              alt="Avatar"
-              width={48}
-              height={48}
-              className="w-12 h-12 rounded-full mr-4"
+              src={user.avatarUrl || "/images/default-avatar.jpg"} // 默认头像路径
+              alt="用户头像"
+              width={40}
+              height={40}
+              className="rounded-full"
             />
 
             {/* 用户信息 */}
-            <div className="flex-1 flex items-center space-x-6">
-              <div className="flex-1">
-                <p className="text-sm text-gray-800">
-                  <strong>昵称:</strong> {user.nickname}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>账号:</strong> {user.account}
-                </p>
-              </div>
+            <div className="flex-1 ml-4">
+              <p className="text-sm text-gray-800">
+                <strong>昵称:</strong> {user.nickName}
+              </p>
+              <p className="text-sm text-gray-800">
+                <strong>邮箱:</strong> {user.email}
+              </p>
+              <p className="text-sm text-gray-600 mt-2">
+                <strong>创建时间:</strong> {formatTimestamp(user.createdTime)}
+              </p>
+            </div>
 
-              {/* 角色标签，右对齐 */}
-              <span className="ml-auto flex flex-wrap space-x-2">
-                <strong>角色:</strong>
-                {roleList.map((role) => {
-                  const hasRole = user.roles?.includes(role.name) || false;
-                  const isSuperAdmin = role.name === "超级管理员" && user.roles?.includes("超级管理员");
-
-                  return (
-                    <span
-                      key={role.idRole}
-                      onClick={() => !isSuperAdmin && toggleUserRole(user.idUser, role.idRole, hasRole)}
-                      className={`px-2 py-1 text-sm rounded-full cursor-pointer ${
-                        isSuperAdmin
-                          ? "bg-yellow-500 text-white"  // 超级管理员使用金黄色背景
-                          : hasRole
-                          ? "bg-purple-400 text-white"  // 有角色的使用紫色背景
-                          : "bg-gray-200 text-gray-600"  // 无角色的使用灰色背景
-                      }`}
-                    >
-                      {role.name}
-                    </span>
-                  );
-                })}
+            {/* 标签和按钮 */}
+            <div className="flex items-center space-x-2">
+              {/* 标签 */}
+              <span className="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+                {user.roleName}
               </span>
+              <span className="px-2 py-1 text-sm rounded-full bg-green-100 text-green-800">
+                {user.activated === 0 ? "未激活" : "已激活"}
+              </span>
+
+              {/* 激活状态按钮 */}
+              <button
+                onClick={() =>
+                  toggleActivationStatus(user.idUser, user.idRole, user.activated)
+                }
+                className={`px-3 py-1 text-sm rounded-md ${
+                  user.activated === 0
+                    ? "bg-red-500 text-white hover:bg-red-600"
+                    : "bg-green-500 text-white hover:bg-green-600"
+                }`}
+              >
+                {user.activated === 0 ? "激活" : "取消激活"}
+              </button>
             </div>
           </div>
         ))}
