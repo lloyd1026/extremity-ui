@@ -2,34 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer base {
+  /* 自定义恢复浏览器默认的标题样式 */
+h1, h2, h3, h4, h5, h6 {
+  font-size: 1em; /* 根据实际需要调整大小 */
+  font-weight: bold; /* 保持粗体 */
+  margin: 0.67em 0; /* 默认的外边距 */
 }
 
-/* @media (prefers-color-scheme: dark) {
+h1 {
+  font-size: 2em; /* 默认的 h1 字体大小 */
+}
+
+h2 {
+  font-size: 1.5em; /* 默认的 h2 字体大小 */
+}
+
+h3 {
+  font-size: 1.17em; /* 默认的 h3 字体大小 */
+}
+
+h4 {
+  font-size: 1em; /* 默认的 h4 字体大小 */
+}
+
+h5 {
+  font-size: 0.83em; /* 默认的 h5 字体大小 */
+}
+
+h6 {
+  font-size: 0.75em; /* 默认的 h6 字体大小 */
+}
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --toolbar: 206 64% 98%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
   }
-} */
+
+  .dark {
+    /* --background: 222 28% 7%; */
+    --background: 222 28% 7%;
+    --foreground: 210 40% 98%;
+    --toolbar: 213 20% 11%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-image: linear-gradient(
+      rgba(250, 247, 238, 0.8),
+      rgba(250, 247, 238, 0.8)
+        /* rgba(247, 245, 243, 0.75),
+      rgba(247, 245, 243, 0.75) */
+    ),
+    url('/background.svg');
 }
-/* 自定义分页指示器的样式 */
-.swiper-pagination-bullet {
-  background-color: rgba(255, 255, 255, 0.3); /* 未激活时设置为透明（透明度为 0.3） */
-  width: 10px; /* 设置点的大小 */
-  height: 10px;
-  opacity: 0.3; /* 未激活时透明 */
-  transition: opacity 0.3s ease; /* 过渡效果 */
+.dark {
+  color: rgba(247, 245, 243, 0.75);
 }
-
-.swiper-pagination-bullet-active {
-  background-color: blue !important; /* 激活时的颜色 */
-  opacity: 1 !important; /* 激活时完全不透明 */
+.dark body {
+  background-image: linear-gradient(
+      /* rgba(33, 33, 33, 0.75),
+      rgba(33, 33, 33, 0.75), */
+        /* rgba(24, 25, 26, 0.85),
+      rgba(24, 25, 26, 0.85), */
+        rgb(13, 16, 23, 0.8),
+      rgb(13, 16, 23, 0.8)
+    ),
+    url('/background.svg');
 }
-
