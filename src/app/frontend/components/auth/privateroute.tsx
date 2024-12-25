@@ -23,13 +23,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
         }
     }
   }, [auth]);
-
-  if (auth===undefined) {
-    // 认证信息为空时，可能正在加载或者跳转
-    return <Loading/>;
-  }
-
-  return <>{children}</>; // 如果认证通过并且角色匹配，则渲染子组件
+  return auth===undefined?<Loading/>:<>{children}</>; // 如果认证通过并且角色匹配，则渲染子组件
 };
 
 export default PrivateRoute;
