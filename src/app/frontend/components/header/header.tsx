@@ -27,9 +27,9 @@ const Header = () => {
     { name: '分类', href: '#', current: false },
     { name : '在线编辑',href: '/frontend/editor',current:false},
     { name : '在线论坛',href: '/frontend/comment',current:false},
+    { name : '成果管理',href: '/frontend/editor',current:false,role:1},
   ]
 
-  
   function classNames(...classes: (string | undefined)[]) {
     return classes.filter(Boolean).join(' ')
   }
@@ -69,11 +69,11 @@ const Header = () => {
     isMounted&&
     <div>
         <div className="relative">
-          <Disclosure as="nav" className="bg-gray-800">
+          <Disclosure as="nav" className="bg-slate-400">
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
               <div className="relative flex h-16 items-center justify-between">
                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                  {/* Mobile menu button*/}
+
                   <Disclosure.Button className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                     <span className="absolute -inset-0.5" />
                     <span className="sr-only">Open main menu</span>
@@ -93,19 +93,25 @@ const Header = () => {
                   </div>
                   <div className="hidden sm:ml-6 sm:block">
                     <div className="flex space-x-4">
-                      {updatedNavigation.map((item) => (
-                        <a
-                          key={item.name}
-                          href={item.href}
-                          aria-current={item.current ? 'page' : undefined}
-                          className={classNames(
-                            item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                            'rounded-md px-3 py-2 text-sm font-medium'
-                          )}
-                        >
-                          {item.name}
-                        </a>
-                      ))}
+                      {updatedNavigation.map((item) => {
+                        if(item.role===undefined||auth?.scope.includes(item.role)){
+                          return (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              aria-current={item.current ? 'page' : undefined}
+                              className={classNames(
+                                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                'rounded-md px-3 py-2 text-sm font-medium'
+                              )}
+                            >
+                              {item.name}
+                            </Link>
+                            )
+                      }
+                    }
+                    )
+                    }
                     </div>
                   </div>
                 </div>

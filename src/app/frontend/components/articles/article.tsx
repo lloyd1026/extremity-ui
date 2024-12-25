@@ -1,6 +1,5 @@
 'use client'; // 确保这是一个 Client Component
 import { useEffect, useState } from "react";
-import { articleDetails } from "../info";
 import Card from "./ariticleCard";
 
 const Article = () => {

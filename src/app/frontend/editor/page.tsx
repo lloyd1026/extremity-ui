@@ -1,10 +1,6 @@
-import React from 'react'
-import { Editor } from '../components/editor'
-
-export default function page() {
-  return (
-    <div>
-      <Editor/>
-    </div>
+"use client";
+export default function Page() {
+  return(
+    null
   )
 }

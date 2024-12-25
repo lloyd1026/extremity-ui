@@ -7,24 +7,7 @@ export interface User{
     avatarUrl:string;
 }
 
-export interface articleDetails{
-    id:number;
-    articleTitle:string;
-    article_thumbnail_url:string;
-    article_author_id:number;
-    article_type:string;
-    article_tags:string;
-    article_view_count:number;
-    article_preview_content:string;
-    article_comment_count:number;
-    article_permalink:string;
-    article_link:string;
-    created_time:string;
-    updated_time:string;
-    article_perfect:string;
-    article_status:string;
-    article_thumbs_u_count:number;
-}
+
 
 export interface commentDetails{
     id:number;
@@ -55,3 +38,21 @@ export const formatTimestamp = (timestamp:string) => {
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // 返回格式化后的时间字符串
 };
+export interface Article {
+    idArticle: number; // 对应 Long 类型
+    articleTitle: string;
+    articleThumbnailUrl: string;
+    articleAuthorId: number; // 对应 Long 类型
+    articleType: string;
+    articleTags: string;
+    articleViewCount: number;
+    articlePreviewContent: string;
+    articleCommentCount: number;
+    articlePerfect: string; // 0: 一般, 1: 精选
+    articlePermalink: string;
+    articleLink: string;
+    createdTime: Date;
+    updatedTime: Date;
+    articleStatus: string;
+    articleThumbsUpCount: number;
+  }

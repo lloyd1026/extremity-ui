@@ -97,7 +97,7 @@ const UserList = () => {
 
   // 页面跳转到用户信息详情页
   const handleUserClick = (userId: number) => {
-    router.push(`/admin/users/${userId}`); // 跳转到用户详情页
+    router.push(`/dashboard/admin/users/${userId}`); // 跳转到用户详情页
   };
 
   const totalPages = Math.ceil(totalUsers / usersPerPage);
