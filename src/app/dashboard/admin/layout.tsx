@@ -1,8 +1,8 @@
 "use client"; // 客户端渲染
 
 import { ReactNode, useState, useEffect} from 'react';
-import Sidebar from '@/app/dashboard/components/Sidebar';
-import UserHeader from '@/app/dashboard/components/AdminHeader';
+import Sidebar from '@/app/dashboard/components/admin/Sidebar';
+import UserHeader from '@/app/dashboard/components/admin/AdminHeader';
 
 import { useRouter } from 'next/navigation';
 import AuthGuard from '@/utils/AuthGard';

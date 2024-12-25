@@ -8,6 +8,7 @@ const register = () => {
   const [email, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [code, setVerificationCode] = useState('');
+  const [message,setMessage] = useState('');
   const [isCodeSent, setIsCodeSent] = useState(false); // 控制验证码是否已发送
   const router = useRouter();
 
@@ -21,7 +22,7 @@ const register = () => {
     }
 
     // 如果有验证码，可以继续注册逻辑
-    const response = await request.post('auth/register', { email, password, code });
+    const response = await request.post('auth/register', { email, password, code,message });
     if(response.data.success){
       alert('注册成功');
       router.push('/frontend/login'); // 登录成功后跳转到目标页面
@@ -102,6 +103,27 @@ const register = () => {
               />
             </div>
           </div>
+          <div>
+          <label htmlFor="message" className="block text-sm font-medium text-gray-900">
+            用户类型
+          </label>
+          <div className="mt-2">
+            <select
+              id="message"
+              name="message"
+              required
+              value={message} // 绑定到 userType 状态
+              onChange={(e) => setMessage(e.target.value)} // 绑定到 setUserType 方法
+              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+            >
+              <option value="" disabled>
+                请选择用户类型
+              </option>
+              <option value="普通用户">普通用户</option>
+              <option value="团队用户">团队用户</option>
+            </select>
+          </div>
+        </div>
 
           {/* 验证码输入 */}
           <div>

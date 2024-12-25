@@ -62,13 +62,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/content')}`}>
                 <FaClipboardList className="mr-4 text-xl text-black" />
                 <Link href="content" className="text-lg text-black hover:text-purple-900">
-                  内容管理
-                </Link>
-              </li>
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/settings')}`}>
-                <FaCogs className="mr-4 text-xl text-black" />
-                <Link href="settings" className="text-lg text-black hover:text-purple-900">
-                  系统设置
+                  内容审核
                 </Link>
               </li>
             </ul>

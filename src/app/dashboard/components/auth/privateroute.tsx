@@ -16,7 +16,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
     if(auth!==undefined){
         if(auth===null){
           console.log("跳转登陆")
-          router.push('/frontend/login');
+          router.push('/dashboard/login');
         }
         else if (roles && !roles.some(role => auth.scope.includes(role))) {
           router.push('/unauthorized');
