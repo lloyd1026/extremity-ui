@@ -1,5 +1,5 @@
 import React from 'react'; // 确保显式导入 React
-import UserList from '@/app/dashboard/components/UserList';
+import UserList from '@/app/dashboard/components/admin/UserList';
 
 const UsersPage = () => {
     return (
