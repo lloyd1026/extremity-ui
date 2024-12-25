@@ -46,6 +46,7 @@ const Profile = () => {
       const fileReader = new FileReader();
       fileReader.onloadend = () => {
         setImagePreview(fileReader.result as string); // 设置图片预览
+        
       };
       fileReader.readAsDataURL(file); // 读取图片文件为Data URL
     }
@@ -79,17 +80,18 @@ const Profile = () => {
     }
   };
 
-  const currentImage = ()=>{
-    if(imagePreview===null){
-      if(user&&user.avatarUrl){
-        return `${config.imageUrl}${user?.avatarUrl}`;
+  const currentImage = () => {
+    if (imagePreview === null) {
+      if (user && user.avatarUrl) {
+        return `${config.imageUrl}${user.avatarUrl}`;
       }
-      return null;
-    }else{
-      return `${config.imageUrl}${imagePreview}`;
+      return "/images/default-avatar.jpg"; // 默认头像
+    } else {
+      return imagePreview; // 直接返回 Data URL
     }
-
   }
+  
+
   return (
       (isMounted&&user!==null)?
     (<div className="max-w-xl mx-auto p-6">

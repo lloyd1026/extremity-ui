@@ -14,8 +14,9 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 控制下拉菜单显示/隐藏
 
   const handleNavigate = () => {
-    const state = {idUser: 6};
-    router.push(`/dashboard/personal-settings?idUser=${state.idUser}`);
+    // const state = {idUser: 6};
+    // router.push(`/dashboard/personal-settings?idUser=${state.idUser}`);
+    router.push("/dashboard/personal-settings");
   }
 
   return (
