@@ -12,6 +12,7 @@ import type { UploadProps } from "antd/es/upload";
 import { UploadOutlined } from "@ant-design/icons";
 import config from "@/config/baseurl_config";
 import { useRouter } from "next/navigation";
+import AttachmentManager from "./attachmentManager";
 
 // 文章类型枚举
 const articleTypeOptions = [
@@ -282,6 +283,7 @@ export default function Content({ id }: { id: string }) {
             </button>
 
           </div>
+          <AttachmentManager draftId={id}/>
         </>
       ) : (
         <Loading />
