@@ -21,7 +21,7 @@ const LogoutButton = () => {
       });
 
       // 跳转到登录页面
-      router.push('/login');
+      router.push('/dashboard/login');
     }
   };
 

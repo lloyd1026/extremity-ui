@@ -45,29 +45,29 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
           <h2 className="text-2xl font-semibold mb-8 text-center text-black">超级管理员</h2>
           <nav>
             <ul>
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/users')}`}>
+              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/users')}`}>
                 <FaUsers className="mr-4 text-xl text-black" />
-                <Link href="/admin/users" className="text-lg text-black hover:text-purple-900">
+                <Link href="users" className="text-lg text-black hover:text-purple-900">
                   用户管理
                 </Link>
               </li>
               
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/permissions')}`}>
+              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/permissions')}`}>
                 <FaShieldAlt className="mr-4 text-xl text-black" />
-                <Link href="/admin/permissions" className="text-lg text-black hover:text-purple-900">
+                <Link href="permissions" className="text-lg text-black hover:text-purple-900">
                   权限管理
                 </Link>
               </li>
 
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/content')}`}>
+              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/content')}`}>
                 <FaClipboardList className="mr-4 text-xl text-black" />
-                <Link href="/admin/content" className="text-lg text-black hover:text-purple-900">
+                <Link href="content" className="text-lg text-black hover:text-purple-900">
                   内容管理
                 </Link>
               </li>
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/admin/settings')}`}>
+              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/settings')}`}>
                 <FaCogs className="mr-4 text-xl text-black" />
-                <Link href="/admin/settings" className="text-lg text-black hover:text-purple-900">
+                <Link href="settings" className="text-lg text-black hover:text-purple-900">
                   系统设置
                 </Link>
               </li>
@@ -76,7 +76,6 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         </div>
       </Transition>
 
-      {/* Sidebar Toggle Button */}
       {/* Sidebar Toggle Button */}
       <button
         className={`fixed top-1/2 transform -translate-y-1/2 ${isOpen ? 'left-[250px]' : 'left-[10px]'} p-3 bg-gray-200 text-black rounded-full shadow-lg ${isOpen ? 'rotate-180' : 'rotate-0'} transition-transform duration-[400ms] ease-in-out`}

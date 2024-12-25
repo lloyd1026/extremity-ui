@@ -1,6 +1,4 @@
-import PermissionForm from '@/app/(dashboard)/components/PermissionForm';
-
-const PermissionsPage = () => {
+const TeamAdminPage = () => {
     return (
       <div className="flex flex-col h-screen">
   
@@ -8,12 +6,11 @@ const PermissionsPage = () => {
         <div
           className={`flex-1 p-4 transition-all duration-300 ease-in-out`}
         >
-          <h1>用户权限管理界</h1>
-          
-          <PermissionForm/>
+          <h1>团队管理员</h1>
+          <p>这里是团队管理员页面的内容</p>
         </div>
       </div>
     );
   };
   
-  export default PermissionsPage;
+  export default TeamAdminPage;
