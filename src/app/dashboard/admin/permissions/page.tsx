@@ -1,4 +1,4 @@
-import PermissionForm from '@/app/dashboard/components/PermissionForm';
+import PermissionForm from '@/app/dashboard/components/admin/PermissionForm';
 
 const PermissionsPage = () => {
     return (

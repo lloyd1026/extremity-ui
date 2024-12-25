@@ -146,7 +146,7 @@ const PermissionsManage = () => {
             </div>
             {/* 标签 */}
             <span className="ml-3 text-sm text-gray-700">
-              {isActivatedFilter ? "已激活" : "未激活"}
+              {isActivatedFilter ? "level 1" : "level 0"}
             </span>
           </label>
         </div>
@@ -187,7 +187,7 @@ const PermissionsManage = () => {
                 {user.roleName}
               </span>
               <span className="px-2 py-1 text-sm rounded-full bg-green-100 text-green-800">
-                {user.activated === 0 ? "未激活" : "已激活"}
+                {user.activated === 0 ? "level 0" : "level 1"}
               </span>
 
               {/* 激活状态按钮 */}
@@ -201,7 +201,7 @@ const PermissionsManage = () => {
                     : "bg-green-500 text-white hover:bg-green-600"
                 }`}
               >
-                {user.activated === 0 ? "激活" : "取消激活"}
+                {user.activated === 0 ? "授权" : "取消授权"}
               </button>
             </div>
           </div>

@@ -37,7 +37,7 @@ export default function Login() {
             router.push('/dashboard/admin/users');
             break;
           case '2':
-            router.push('/dashboard/team-admin');
+            router.push('/dashboard/team-admin/team-info');
             break;
           default:
             alert('未知角色，无法跳转'); // 没什么用，不能保护

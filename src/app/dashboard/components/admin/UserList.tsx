@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import request from "@/utils/request";
 import { useRouter } from "next/navigation";
-import AddUser from "@/app/dashboard/components/AddUser";
-import RoleSelector from "@/app/dashboard/components/RoleSelector";
-// import ShowUserInfo from "@/app/(dashboard)/components/ShowUserInfo";
+import AddUser from "@/app/dashboard/components/admin/AddUser";
+import RoleSelector from "@/app/dashboard/components/admin/RoleSelector";
 
 interface User {
   idUser: number;
