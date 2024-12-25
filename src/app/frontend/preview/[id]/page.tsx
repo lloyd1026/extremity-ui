@@ -251,7 +251,6 @@ const PreviewPage = () => {
           <div className='aspect-video relative mb-10 rounded-lg overflow-hidden'>
             <Image src={getThumbUrl()} fill alt={post.articleTitle} />
           </div>
-
           <article ref={contentRef}>
             <Editor
               ref={editorRef}
