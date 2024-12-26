@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import request from "@/utils/request";
+import Image from "next/image";
+import config from '@/config/baseurl_config';
 
 interface UserInfoDTO {
   idUser: number;
@@ -62,10 +64,12 @@ const UserDetail = () => {
       {userInfo && (
         <div className="bg-gray-100 rounded-lg p-6 shadow-lg">
           <div className="flex flex-col items-center mb-6">
-            <img
-              src={userInfo.avatarUrl || "/images/default-avatar.jpg"}
-              alt="Avatar"
-              className="rounded-full w-20 h-20 mb-4 border-2 border-gray-300"
+            <Image
+              src={userInfo?.avatarUrl ? `${config.imageUrl}${userInfo.avatarUrl}` : "/images/default-avatar.jpg"}
+              alt="用户头像"
+              width={100}
+              height={100}
+              className="rounded-full"
             />
             <h2 className="text-3xl font-bold">{userInfo.nickname}</h2>
           </div>
@@ -75,7 +79,7 @@ const UserDetail = () => {
               { label: "账号", value: userInfo.account },
               { label: "Email", value: userInfo.email },
               { label: "手机", value: userInfo.phone || "未提供" },
-              { label: "性别", value: userInfo.sex },
+              { label: "性别", value: userInfo.sex === "0" ? "女" : "男" },
               { label: "签名", value: userInfo.signature || "无" },
               { label: "状态", value: userInfo.status },
               { label: "最后登录时间", value: userInfo.lastLoginTime },
