@@ -1,9 +1,13 @@
+"use client";
 import { FaRegEnvelope, FaCog } from 'react-icons/fa'; // 导入你需要的图标
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react'; // 用于控制下拉菜单显示
+import { useState, useEffect } from 'react'; // 用于控制下拉菜单显示
 import LogoutButton from '@/app/dashboard/components/LogoutButton'; // 引入退出登录组件
 import { useRouter } from "next/navigation";
+import { useAuth } from '@/app/dashboard/components/auth/authcontext';
+import {userwithRoles} from '@/interfaces/userwithRoles'
+import config from '@/config/baseurl_config';
 
 interface AdminHeaderProps {
   isSidebarOpen: boolean; // 传递侧边栏展开状态
@@ -11,13 +15,31 @@ interface AdminHeaderProps {
 
 const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
   const router = useRouter(); // 控制页面跳转
+  const { auth } = useAuth() as {auth:userwithRoles|null};
+  const [isMounted, setIsMounted] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 控制下拉菜单显示/隐藏
 
+  useEffect(() => {
+        setIsMounted(true);
+  }, []);
+
   const handleNavigate = () => {
-    // const state = {idUser: 6};
-    // router.push(`/dashboard/personal-settings?idUser=${state.idUser}`);
     router.push("/dashboard/personal-settings");
   }
+
+  const avatar = ()=>{
+    if(!isMounted){
+      return "/images/default-avatar.jpg"
+    }
+
+    if(!auth){
+      return "/images/default-avatar.jpg"
+    }
+    if(auth.avatarUrl&&auth.avatarUrl.length!=0){
+      return config.imageUrl+auth.avatarUrl;
+    }
+      return "/images/default-avatar.jpg"
+   }
 
   return (
     <header
@@ -52,7 +74,7 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
           onMouseLeave={() => setIsDropdownOpen(false)} // 鼠标离开时隐藏下拉菜单
         >
           <Image
-            src="/images/default-avatar.jpg"
+            src={avatar()}
             alt="User Avatar"
             width={40}
             height={40}
