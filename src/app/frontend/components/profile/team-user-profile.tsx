@@ -9,10 +9,10 @@ import Loading from '../loading/loading';
 import config from '@/config/baseurl_config';
 interface TeamUserDetails {
     idRole: number;
-    position: string;
-    personalBio: string;
-    researchDirection: string;
-    researchOverview: string;
+    position: string|null;
+    personalBio: string|null;
+    researchDirection: string|null;
+    researchOverview: string|null;
   }
 const TeamUserProfile = () => {
   const [image, setImage] = useState<File | null>(null); // 存储选择的图片
@@ -23,10 +23,10 @@ const TeamUserProfile = () => {
   const [phone, setPhone] = useState<string>(''); // 存储电话号码
   const [user, setUser] = useState<User |null>(null);
   const [teamUser,setTeamUser] = useState<TeamUserDetails|null>(null);
-  const [position,setPosition] = useState<string>('');
-  const [researchDirection,setResearchDirection] = useState<string>('');
-  const [researchOverview,setResearchOverview] = useState<string>('');
-  const [personalBio,setPersonalBio] = useState<string>('');
+  const [position,setPosition] = useState<string|null>(null);
+  const [researchDirection,setResearchDirection] = useState<string|null>(null);
+  const [researchOverview,setResearchOverview] = useState<string|null>(null);
+  const [personalBio,setPersonalBio] = useState<string|null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const { auth } = useAuth();
 
@@ -86,14 +86,13 @@ const TeamUserProfile = () => {
     formData.append('name', name); // 添加姓名到FormData
     formData.append('sex', gender); // 添加性别到FormData
     formData.append('phone', phone); // 添加电话号码到FormData
-    
-        const teamUser1:TeamUserDetails = {
+    const teamUser1:TeamUserDetails = {
             idRole:auth?.idUser,
             position:position,
             researchDirection:researchDirection,
             researchOverview:researchOverview,
             personalBio:personalBio
-        }
+    }
     const response1 = await request.post('/team-user/upload-avatar',teamUser1)
     const response2 = await request.post('/user/upload-avatar', formData, {
       headers: {
@@ -178,7 +177,7 @@ const TeamUserProfile = () => {
           type="text"
           id="account"
           name="account"
-          value={account||(user?.account)||""}
+          value={account||(user?.account)}
           onChange={(e) => setAccount(e.target.value)}
           className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="请输入您的用户名"
@@ -194,7 +193,7 @@ const TeamUserProfile = () => {
           type="text"
           id="name"
           name="name"
-          value={name||user?.realName||""}
+          value={name||user?.realName}
           onChange={(e) => setName(e.target.value)}
           className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="请输入您的姓名"
@@ -209,7 +208,7 @@ const TeamUserProfile = () => {
         <select
           id="gender"
           name="gender"
-          value={gender||user?.sex||""}
+          value={gender||user?.sex}
           onChange={(e) => setGender(e.target.value)}
           className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
         >
@@ -228,7 +227,7 @@ const TeamUserProfile = () => {
           type="tel"
           id="phone"
           name="phone"
-          value={phone||user?.phone||""}
+          value={phone||user?.phone}
           onChange={(e) => setPhone(e.target.value)}
           className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="请输入您的电话号码"
@@ -269,8 +268,8 @@ const TeamUserProfile = () => {
   <textarea
     id="researchOverview"
     name="researchOverview"
-    value={researchOverview || teamUser?.researchOverview || ""}
-    onChange={(e) => setResearchDirection(e.target.value)}
+    value={researchOverview || teamUser?.researchOverview||""}
+    onChange={(e) => setResearchOverview(e.target.value)}
     className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
     placeholder="输入研究概述"
     rows={4} // 控制文本框的行数
