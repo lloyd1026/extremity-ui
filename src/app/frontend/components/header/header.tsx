@@ -26,7 +26,6 @@ const Header = () => {
     { name: '主页', href: '/frontend', current: false },
     { name: '分类', href: '#', current: false },
     { name : '在线论坛',href: '/frontend/comment',current:false},
-    { name : '成果管理',href: '/frontend/editor',current:false,role:1},
   ]
 
   function classNames(...classes: (string | undefined)[]) {
