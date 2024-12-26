@@ -5,7 +5,6 @@ import UserAvatar from './UserAvatar';
 import { User } from '../info';
 import { useAuth } from "../auth/authcontext";
 import userwithRoles from "@/interfaces/userwithRoles";
-import request from "@/utils/request";
 import CommentForm from './CommentBox';
 
 interface ReplyItemProps {
@@ -26,40 +25,46 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, user, parentAccount, onRep
     };
 
     return (
-        <div
-            style={{
-                marginBottom: "10px",
-                padding: "5px",
-                backgroundColor: "#f9f9f9",
-                border: "1px solid #ddd",
-            }}
-        >
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+        <div className="mb-4 p-4 bg-gray-100 border border-gray-300 rounded-md shadow-sm">
+            {/* Reply Header */}
+            <div className="flex items-start mb-2">
                 <UserAvatar user={user} size={30} />
-                <div>
-                    <span style={{ color: "gray" }}>
+                <div className="ml-3 flex-1">
+                    <span className="text-gray-600 font-semibold">
                         {user.account || "Anonymous"} 
-                        {parentAccount ? ` > Replying to ${parentAccount}` : ""}
+                        {parentAccount && (
+                            <span className="text-gray-500"> &gt; 回复 {parentAccount}</span>
+                        )}
                     </span>
-                    <br />
-                    {reply.comment}
+                    <p className="mt-1 text-gray-700">{reply.comment}</p>
                 </div>
             </div>
-            <div style={{ color: "gray" }}>
+            {/* Timestamp */}
+            <div className="text-sm text-gray-500">
                 {formatTimestamp(reply.updatedAt)}
             </div>
+            {/* Actions */}
             {auth?.scope[0] === 3 && (
-                <button onClick={() => setShowReplyForm(!showReplyForm)}>
-                    Reply
-                </button>
+                <div className="mt-2">
+                    <button
+                        onClick={() => setShowReplyForm(!showReplyForm)}
+                        className="text-blue-500 hover:text-blue-700 text-sm focus:outline-none"
+                        aria-expanded={showReplyForm ? "true" : "false"}
+                        aria-controls={`reply-form-${reply.id}`}
+                    >
+                        {showReplyForm ? "取消回复" : "回复"}
+                    </button>
+                </div>
             )}
-
+            {/* Reply Form */}
             {showReplyForm && (
-                <CommentForm
-                    onSubmit={handleReply}
-                    onCancel={() => setShowReplyForm(false)}
-                    placeholder="输入你的回复"
-                />
+                <div className="mt-4 transition-opacity duration-300 ease-in-out opacity-100">
+                    <CommentForm
+                        onSubmit={handleReply}
+                        onCancel={() => setShowReplyForm(false)}
+                        placeholder="输入你的回复"
+                    />
+                </div>
             )}
         </div>
     );

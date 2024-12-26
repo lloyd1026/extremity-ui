@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Editor, EditorRef } from "@/components/editor";
 import { browserFileTable } from "@/components/editor/lib/browser-file-table";
 import instance from "@/utils/request";
@@ -13,6 +13,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import config from "@/config/baseurl_config";
 import { useRouter } from "next/navigation";
 import AttachmentManager from "./attachmentManager";
+import { useSharedState, useUpdateSharedState } from "./sharedContext";
 
 // 文章类型枚举
 const articleTypeOptions = [
@@ -48,13 +49,16 @@ function processImages(node: any, imageMap: Record<string, File>) {
     const { src } = node.attrs;
 
     if (src.startsWith("data:image/")) {
-      // Base64
-      const file = base64ToFile(src);
-      const uploadKey = generateUploadKey();
-      node.attrs.src = uploadKey; // 在 JSON 中记录
-      imageMap[uploadKey] = file; // 在映射表中保存 File
+      try {
+        const file = base64ToFile(src);
+        const uploadKey = generateUploadKey();
+        node.attrs.src = uploadKey; // 在 JSON 中记录
+        imageMap[uploadKey] = file; // 在映射表中保存 File
+      } catch (error) {
+        console.error("Base64 转换失败", error);
+
+      }
     } else if (browserFileTable[src]) {
-      // 本地缓存
       const file = browserFileTable[src];
       const uploadKey = generateUploadKey();
       node.attrs.src = uploadKey;
@@ -69,6 +73,15 @@ function processImages(node: any, imageMap: Record<string, File>) {
   }
 }
 
+interface ArticleInfo {
+  articlePreviewContent: string;
+  articleType: number;
+  articleTags: string;
+  articleThumbnailUrl: string;
+  articleStatus: string;
+  // 其他字段...
+}
+
 export default function Content({ id }: { id: string }) {
   const editorRef = useRef<EditorRef>(null);
 
@@ -81,10 +94,16 @@ export default function Content({ id }: { id: string }) {
   // 用于存储(新)封面上传文件
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
+  const [articleInfo, setArticleInfo] = useState<ArticleInfo | null>(null);
+
+  const sharedState = useSharedState();
+  const setSharedState = useUpdateSharedState();
+
   // AntD 表单
   const [form] = Form.useForm();
 
-  const route = useRouter()
+  const route = useRouter();
+
   /**
    * 1. 获取文章的“正文”内容（草稿JSON），并回显到编辑器中
    */
@@ -92,21 +111,30 @@ export default function Content({ id }: { id: string }) {
     const getContent = async () => {
       try {
         const response = await instance.get(`/article/Draft/${id}`);
+        if(!editorRef.current){
+          return
+        }
         if (!response || !response.data.success) {
           toast.error("获取内容失败！请稍后重试！");
           return;
         }
-
-        if (!editorRef.current) return;
         const editor = editorRef.current.getEditor();
         editor.commands.setContent(response.data.data);
-      } catch (error) {
+      } catch (error: any) {
+        console.log(error)
         toast.error("获取内容异常！");
       }
     };
-    getContent();
-    setIsMounted(true);
-  }, [id]);
+
+    const fetchData = async () => {
+      await fetchArticleInfo();
+      await getContent();
+      setIsMounted(true);
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, sharedState]);
 
   /**
    * 2. 保存富文本内容：把所有图片抽取并用 FormData 上传
@@ -139,37 +167,35 @@ export default function Content({ id }: { id: string }) {
     try {
       const response = await instance.post(`/article/UpdateDraft/${id}`, formData);
       if (!response || !response.data.success) {
-        toast.error("上传失败！请稍后重试！");
+        toast.error(response.data.message || "上传失败！请稍后重试！");
         return;
       }
       // 后端会返回更新后的 JSON，再 set 回编辑器
       const updatedJson = response.data.data;
       editor.commands.setContent(updatedJson);
       toast.success("上传成功!");
-    } catch (error) {
-      toast.error("上传失败！请稍后重试！");
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "上传失败！请稍后重试！";
+      toast.error(errorMsg);
     }
   };
 
   /**
    * 3. 点击“编辑文章详细信息”按钮时，先获取文章的摘要、类型、标签、封面等，再回显到 Form 表单
    */
-  const handleEdit = async () => {
+  const fetchArticleInfo = async () => {
     try {
       const response = await instance.get(`/article/DraftCompendium/${id}`);
       if (!response.data.success) {
         toast.error("获取信息失败");
-        return;
+        return false;
       }
-
-      // 回显摘要、标签、类型
-      form.setFieldValue("summary", response.data.data.articlePreviewContent);
-      form.setFieldValue("articleType", Number(response.data.data.articleType) || 0);
-
-      if (response.data.data.articleTags) {
-        form.setFieldValue("tags", response.data.data.articleTags.split(","));
-      }
-
+      setArticleInfo(response.data.data);
+      form.setFieldsValue({
+        summary: response.data.data.articlePreviewContent,
+        articleType: Number(response.data.data.articleType) || 0,
+        tags: response.data.data.articleTags ? response.data.data.articleTags.split(",") : [],
+      });
       // 封面预览
       const thumbnailUrl = response.data.data.articleThumbnailUrl;
       if (thumbnailUrl) {
@@ -177,13 +203,18 @@ export default function Content({ id }: { id: string }) {
       } else {
         setCoverUrl(null);
       }
-
-      // 每次点击编辑时，把 coverFile 清空，以免残留
       setCoverFile(null);
+      return true;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "获取信息失败");
+      return false;
+    }
+  };
 
+  const handleEdit = async () => {
+    const res = await fetchArticleInfo();
+    if (res === true) {
       setIsOpen(true);
-    } catch (error) {
-      toast.error("获取信息失败");
     }
   };
 
@@ -214,8 +245,7 @@ export default function Content({ id }: { id: string }) {
       setConfirmLoading(true);
 
       // 3) 发请求
-      const response = await instance.post("/article/DraftCompendium", formData
-      );
+      const response = await instance.post("/article/DraftCompendium", formData);
 
       if (response.data.success) {
         toast.success("文章信息更新成功！");
@@ -224,12 +254,15 @@ export default function Content({ id }: { id: string }) {
         if (coverFile) {
           setCoverUrl(URL.createObjectURL(coverFile));
         }
+        // 刷新文章信息
+        await fetchArticleInfo();
       } else {
         toast.error(response.data.message || "提交失败");
       }
-    } catch (error) {
+    } catch (error: any) {
       // 如果是表单没通过校验，会直接抛异常到这里
-      toast.error("请检查必填项是否填写完整");
+      const errorMsg = error.response?.data?.message || "请检查必填项是否填写完整";
+      toast.error(errorMsg);
     } finally {
       setConfirmLoading(false);
     }
@@ -238,6 +271,38 @@ export default function Content({ id }: { id: string }) {
   // 取消按钮
   const handleCancel = () => {
     setIsOpen(false);
+  };
+
+  const handleDoAudit = async () => {
+    try {
+      const response = await instance.get(`/article/doAudit/${id}`);
+      if (response.data.success) {
+        toast.success("申请成功!");
+        setSharedState(prev => !prev);
+        fetchArticleInfo();
+      } else {
+        toast.error(response.data.message || "申请失败!");
+      }
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "申请失败!";
+      toast.error(errorMsg);
+    }
+  };
+
+  const handleUndoAudit = async () => {
+    try {
+      const response = await instance.get(`/article/undoAudit/${id}`);
+      if (response.data.success) {
+        toast.success("撤回成功!");
+        setSharedState(prev => !prev);
+        fetchArticleInfo();
+      } else {
+        toast.error(response.data.message || "撤回失败!");
+      }
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "撤回失败!";
+      toast.error(errorMsg);
+    }
   };
 
   // 封面上传组件的 props
@@ -251,119 +316,152 @@ export default function Content({ id }: { id: string }) {
     maxCount: 1,
   };
 
+  const isEditable = useMemo(() => {
+    if (!articleInfo) return true;
+    return articleInfo.articleStatus === "0";
+  }, [articleInfo]);
+
+  // 释放封面 URL
+  useEffect(() => {
+    if (coverFile) {
+      const objectUrl = URL.createObjectURL(coverFile);
+      setCoverUrl(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+  }, [coverFile]);
+
   return (
     <div className="container mx-auto">
       {isMounted ? (
         <>
-          <Editor ref={editorRef} />
-          <div className="flex flex-col justify-center mt-6 gap-4">
-            {/* 1. 保存富文本内容 */}
-            <button
-              onClick={handleUpload}
-              className="h-12 w-full py-2 text-center text-base font-medium bg-orange-50 rounded-lg shadow-lg hover:bg-orange-100 focus:outline-none focus:ring-4 focus:ring-blue-300"
-            >
-              保存富文本内容
-            </button>
+          {isEditable && <Editor ref={editorRef} />}
 
-            {/* 2. 编辑文章摘要、类型、标签、封面等 */}
-            <button
-              onClick={handleEdit}
-              className="h-12 w-full py-2 text-center text-base font-medium bg-orange-50 rounded-lg shadow-lg hover:bg-orange-100 focus:outline-none focus:ring-4 focus:ring-blue-300"
-            >
-              编辑文章详细信息
-            </button>
+          <div className="w-10/12 flex flex-col justify-center mt-6 gap-4">
+            {isEditable ? (
+              <>
+                <Button
+                  type="primary"
+                  onClick={handleUpload}
+                  className="h-12 w-full"
+                >
+                  保存富文本内容
+                </Button>
 
-            <button
-              onClick={()=>{
-                route.push(`/frontend/preview/${id}`)
+                <Button
+                  onClick={handleEdit}
+                  className="h-12 w-full"
+                >
+                  编辑文章详细信息
+                </Button>
+
+                <Button
+                  type="primary"
+                  onClick={handleDoAudit}
+                  className="h-12 w-full"
+                >
+                  申请投递文章
+                </Button>
+              </>
+            ) : (
+              articleInfo?.articleStatus === "2" && (
+                <Button
+                  onClick={handleUndoAudit}
+                  className="h-12 w-full"
+                >
+                  撤回投递文章
+                </Button>
+              )
+            )}
+            <Button
+              onClick={() => {
+                route.push(`/frontend/preview/${id}`);
               }}
-              className="h-12 w-full py-2 text-center text-base font-medium bg-orange-50 rounded-lg shadow-lg hover:bg-orange-100 focus:outline-none focus:ring-4 focus:ring-blue-300"
+              className="h-12 w-full"
             >
               预览
-            </button>
-
+            </Button>
           </div>
-          <AttachmentManager draftId={id}/>
+          <div className="w-10/12">
+            <AttachmentManager draftId={id} canModify={isEditable} />
+          </div>
+
+          {/* 弹窗：编辑文章细则 */}
+          <Modal
+            getContainer={false}
+            title="编辑文章细则"
+            open={isOpen}
+            onOk={handleOk}
+            confirmLoading={confirmLoading}
+            onCancel={handleCancel}
+            destroyOnClose
+          >
+            <Form
+              form={form}
+              layout="vertical"
+              initialValues={{
+                summary: "",
+                articleType: 0,
+                tags: [],
+              }}
+            >
+              <Form.Item
+                label="文章摘要"
+                name="summary"
+                rules={[{ required: true, message: "请输入文章摘要" }]}
+              >
+                <Input.TextArea rows={4} placeholder="请输入文章摘要" />
+              </Form.Item>
+
+              <Form.Item
+                label="文章类别"
+                name="articleType"
+                rules={[{ required: true, message: "请选择文章类别" }]}
+              >
+                <Select options={articleTypeOptions} placeholder="请选择文章类别" />
+              </Form.Item>
+
+              <Form.Item label="文章标签" name="tags">
+                <Select
+                  mode="tags"
+                  style={{ width: "100%" }}
+                  placeholder="请输入标签后回车"
+                />
+              </Form.Item>
+
+              <Form.Item label="文章封面">
+                {/* 如果当前已选择了新文件，就显示新文件的预览 */}
+                {coverFile ? (
+                  <div style={{ marginBottom: 8 }}>
+                    <img
+                      src={coverUrl || null}
+                      alt="预览封面"
+                      style={{ maxWidth: "100%", maxHeight: 200, marginBottom: 8 }}
+                    />
+                    <div>{coverFile.name}</div>
+                  </div>
+                ) : coverUrl ? (
+                  // 如果没有选择新文件，但后端有返回封面，就显示后端原本的封面
+                  <div style={{ marginBottom: 8 }}>
+                    <img
+                      src={coverUrl}
+                      alt="当前封面"
+                      style={{ maxWidth: "100%", maxHeight: 200, marginBottom: 8 }}
+                    />
+                    <div>当前封面</div>
+                  </div>
+                ) : null}
+                {/* 上传组件 */}
+                <Upload {...uploadProps}>
+                  <Button icon={<UploadOutlined />}>选择封面</Button>
+                </Upload>
+              </Form.Item>
+            </Form>
+          </Modal>
         </>
       ) : (
         <Loading />
       )}
-
-      {/* 弹窗：编辑文章细则 */}
-      <Form form={form}>
-      </Form>
-      <Modal
-        getContainer={false}
-        title="编辑文章细则"
-        open={isOpen}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-        destroyOnClose
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={{
-            summary: "",
-            articleType: 0,
-            tags: [],
-          }}
-        >
-          <Form.Item
-            label="文章摘要"
-            name="summary"
-            rules={[{ required: true, message: "请输入文章摘要" }]}
-          >
-            <Input.TextArea rows={4} placeholder="请输入文章摘要" />
-          </Form.Item>
-
-          <Form.Item
-            label="文章类别"
-            name="articleType"
-            rules={[{ required: true, message: "请选择文章类别" }]}
-          >
-            <Select options={articleTypeOptions} placeholder="请选择文章类别" />
-          </Form.Item>
-
-          <Form.Item label="文章标签" name="tags">
-            <Select
-              mode="tags"
-              style={{ width: "100%" }}
-              placeholder="请输入标签后回车"
-            />
-          </Form.Item>
-
-          <Form.Item label="文章封面">
-            {/* 如果当前已选择了新文件，就显示新文件的预览 */}
-            {coverFile ? (
-              <div style={{ marginBottom: 8 }}>
-                <img
-                  src={URL.createObjectURL(coverFile)}
-                  alt="预览封面"
-                  style={{ maxWidth: "100%", maxHeight: 200, marginBottom: 8 }}
-                />
-                <div>{coverFile.name}</div>
-              </div>
-            ) : coverUrl ? (
-              // 如果没有选择新文件，但后端有返回封面，就显示后端原本的封面
-              <div style={{ marginBottom: 8 }}>
-                <img
-                  src={coverUrl}
-                  alt="当前封面"
-                  style={{ maxWidth: "100%", maxHeight: 200, marginBottom: 8 }}
-                />
-                <div>当前封面</div>
-              </div>
-            ) : null}
-            {/* 上传组件 */}
-            <Upload {...uploadProps}>
-              <Button icon={<UploadOutlined />}>选择封面</Button>
-            </Upload>
-          </Form.Item>
-
-        </Form>
-      </Modal>
     </div>
   );
 }

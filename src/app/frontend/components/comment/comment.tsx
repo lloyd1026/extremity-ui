@@ -9,7 +9,9 @@ import { useAuth } from "../auth/authcontext";
 import userwithRoles from "@/interfaces/userwithRoles";
 import CommentItem from './CommentItem';
 import CommentForm from './CommentBox';
+
 const PAGE_SIZE = 5; // 每页显示五条顶级评论
+
 const CommentSection: React.FC = () => {
     const [topComments, setTopComments] = useState<commentDetails[]>([]);
     const [replys, setReplys] = useState<{ [key: number]: commentDetails[] }>({});
@@ -187,11 +189,13 @@ const CommentSection: React.FC = () => {
             alert("Failed to submit comment. Please try again.");
         }
     };
+
     const getCurrentPageComments = () => {
         const start = (currentPage - 1) * PAGE_SIZE;
         const end = start + PAGE_SIZE;
         return topComments.slice(start, end);
     };
+
     const handlePageChange = (page: number) => {
         if (page < 1 || page > totalPages) return;
         setCurrentPage(page);
@@ -203,74 +207,82 @@ const CommentSection: React.FC = () => {
     }, []);
 
     return (
-        <div>
-            {/* New Comment Form */}
+        <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+            {/* 标题 */}
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">在线问答</h2>
+
+            {/* 新评论表单 */}
             {auth?.scope[0] === 4 && (
-                <div style={{ marginTop: "10px" }}>
+                <div className="mb-6">
                     <CommentForm
                         onSubmit={handleSubmitTopComment}
-                        placeholder="发表评论"
+                        placeholder="发表评论..."
                     />
                 </div>
             )}
 
-            {/* List of Top-Level Comments */}
-            {getCurrentPageComments().map((comment) => {
-                const user = userDetails[comment.userId] || { account: "Unknown", avatarUrl: defaultAvatar };
-                const repliesForComment = replys[comment.id];
-                return (
-                    <CommentItem
-                        key={comment.id}
-                        comment={comment}
-                        user={user}
-                        replies={repliesForComment}
-                        users={userDetails}
-                        commentMap={commentMap}
-                        onToggleReplies={handleToggleReplies}
-                        onSetReplyingTo={setReplyingTo}
-                        onSubmitReply={handleSubmitReply}
-                    />
-                );
-            })}
+            {/* 顶级评论列表 */}
+            <div className="space-y-4">
+                {getCurrentPageComments().map((comment) => {
+                    const user = userDetails[comment.userId] || { account: "Unknown", avatarUrl: defaultAvatar };
+                    const repliesForComment = replys[comment.id];
+                    return (
+                        <CommentItem
+                            key={comment.id}
+                            comment={comment}
+                            user={user}
+                            replies={repliesForComment}
+                            users={userDetails}
+                            commentMap={commentMap}
+                            onToggleReplies={handleToggleReplies}
+                            onSetReplyingTo={setReplyingTo}
+                            onSubmitReply={handleSubmitReply}
+                        />
+                    );
+                })}
+            </div>
+
             {/* 分页控制 */}
-            <div className="flex justify-center mt-6 space-x-2">
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded-md ${
-                        currentPage === 1
-                            ? "bg-gray-300 cursor-not-allowed"
-                            : "bg-blue-500 text-white hover:bg-blue-600"
-                    }`}
-                >
-                    上一页
-                </button>
-                {/* 显示页码按钮 */}
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+            {totalPages > 1 && (
+                <div className="flex justify-center mt-6 space-x-2">
                     <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`px-3 py-1 rounded-md ${
-                            currentPage === page
-                                ? "bg-blue-700 text-white"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={`px-4 py-2 rounded-md text-sm font-medium ${
+                            currentPage === 1
+                                ? "bg-gray-300 text-gray-700 cursor-not-allowed"
                                 : "bg-blue-500 text-white hover:bg-blue-600"
                         }`}
                     >
-                        {page}
+                        上一页
                     </button>
-                ))}
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className={`px-3 py-1 rounded-md ${
-                        currentPage === totalPages
-                            ? "bg-gray-300 cursor-not-allowed"
-                            : "bg-blue-500 text-white hover:bg-blue-600"
-                    }`}
-                >
-                    下一页
-                </button>
-            </div>
+                    {/* 显示页码按钮 */}
+                    {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                        <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`px-4 py-2 rounded-md text-sm font-medium ${
+                                currentPage === page
+                                    ? "bg-blue-700 text-white"
+                                    : "bg-blue-500 text-white hover:bg-blue-600"
+                            }`}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={`px-4 py-2 rounded-md text-sm font-medium ${
+                            currentPage === totalPages
+                                ? "bg-gray-300 text-gray-700 cursor-not-allowed"
+                                : "bg-blue-500 text-white hover:bg-blue-600"
+                        }`}
+                    >
+                        下一页
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

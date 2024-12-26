@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import instance from "@/utils/request";
 import { toast } from "react-toastify";
 import { useAuth } from "../auth/authcontext";
+import { useSharedState,useUpdateSharedState} from "./sharedContext";
 
 interface Article {
   idArticle: string|null;
@@ -19,7 +20,11 @@ const Sidebar = () => {
 
   // 草稿 & 已发布
   const drafts = articles.filter((item) => item.articleStatus === "0");
+  const audit = articles.filter((item) => item.articleStatus === "2");
   const published = articles.filter((item) => item.articleStatus === "1");
+
+  const sharedState = useSharedState();
+  const setSharedState = useUpdateSharedState();
 
   // 占位符行输入框的 ref，用于聚焦
   const placeholderInputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +44,7 @@ const Sidebar = () => {
     if (auth) {
       fetchArticles();
     }
-  }, [auth]);
+  }, [auth,sharedState]);
 
   /**
    * ---------------------------
@@ -64,7 +69,7 @@ const Sidebar = () => {
         if (response.data.success) {
             newArticle.idArticle = response.data.data;
             setArticles([ ...articles,newArticle]);
-            toast.error("创建文章成功");
+            toast.success("创建文章成功");
         }else{
             toast.error("创建文章失败");
         }
@@ -241,6 +246,12 @@ const Sidebar = () => {
         </div>
       )}
 
+        {audit.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold text-gray-600 mb-2">审核中</h3>
+          <ul className="space-y-1">{renderList(audit)}</ul>
+        </div>
+      )}
       {published.length > 0 && (
         <div>
           <h3 className="text-xs font-bold text-gray-600 mb-2">已发布</h3>

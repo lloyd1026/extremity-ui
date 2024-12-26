@@ -24,8 +24,7 @@ const Header = () => {
 
   const navigation = [
     { name: '主页', href: '/frontend', current: false },
-    { name: '分类', href: '#', current: false },
-    { name : '在线编辑',href: '/frontend/editor',current:false},
+    { name: '分类', href: '/frontend/classification', current: false },
     { name : '在线论坛',href: '/frontend/comment',current:false},
     { name : '成果管理',href: '/frontend/editor',current:false,role:1},
   ]

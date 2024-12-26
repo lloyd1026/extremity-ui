@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   Table,
   Button,
@@ -15,7 +14,7 @@ import instance from '@/utils/request';
 import { toast } from 'react-toastify';
 import config from '@/config/baseurl_config';
 
-function AttachmentManager({ draftId }) {
+function AttachmentManager({ draftId, canModify = true }) { // 添加 canModify prop，默认值为 true
   // 附件列表
   const [attachments, setAttachments] = useState([]);
   // 加载状态
@@ -26,11 +25,10 @@ function AttachmentManager({ draftId }) {
 
   const [editorOpen, setEditorOpen] = useState(false);
 
-  const [currentEdit,setCurrentEdit] = useState(null);
+  const [currentEdit, setCurrentEdit] = useState(null);
 
   const [previewUrl, setPreviewUrl] = useState('');
-  const [currentName,setCurrentName] = useState("");
-
+  const [currentName, setCurrentName] = useState("");
 
   // 1. 获取附件列表
   const fetchAttachments = async () => {
@@ -70,7 +68,7 @@ function AttachmentManager({ draftId }) {
   // 3. 打开预览 Modal
   const handlePreview = (record) => {
     // 假设 record.attachementUrl 可以直接访问，若需拼完整 URL，请自行拼接
-    setPreviewUrl(config.baseUrl+record.attachmentUrl);
+    setPreviewUrl(config.baseUrl + record.attachmentUrl);
     setPreviewVisible(true);
   };
 
@@ -97,8 +95,7 @@ function AttachmentManager({ draftId }) {
     formData.append('file', file);
 
     try {
-      const res = await instance.post(`/article/attachment/${draftId}`, formData
-      );
+      const res = await instance.post(`/article/attachment/${draftId}`, formData);
       // 上传成功
       toast.success('上传成功');
       onSuccess && onSuccess(res.data, file);
@@ -109,29 +106,29 @@ function AttachmentManager({ draftId }) {
     }
   };
 
-  const handleEdit = (record)=>{
+  const handleEdit = (record) => {
     setCurrentEdit(record.id);
-    setCurrentName(record.attachmentName)
-    setEditorOpen(true)
-  }
+    setCurrentName(record.attachmentName);
+    setEditorOpen(true);
+  };
 
-  const handleChangeFileName = async()=>{
-    try{
-        const response = await instance.put(`/article/attachment/${currentEdit}`,{"attachmentName":currentName});
-        if(response.data.success){
-            toast.success("修改成功");
-            fetchAttachments();
-            setEditorOpen(false);
-            setCurrentEdit(null)
-            setCurrentName("")
-        }else{
-            toast.error("修改失败");
-        }
-    }
-    catch{
+  const handleChangeFileName = async () => {
+    try {
+      const response = await instance.put(`/article/attachment/${currentEdit}`, { "attachmentName": currentName });
+      if (response.data.success) {
+        toast.success("修改成功");
+        fetchAttachments();
+        setEditorOpen(false);
+        setCurrentEdit(null);
+        setCurrentName("");
+      } else {
         toast.error("修改失败");
+      }
     }
-  }
+    catch {
+      toast.error("修改失败");
+    }
+  };
 
   // 7. 表格列定义
   const columns = [
@@ -158,14 +155,17 @@ function AttachmentManager({ draftId }) {
             预览
           </Button>
 
-          <Button type="primary" onClick={() => handleEdit(record)}>
-            编辑
-          </Button>
+          {canModify && (
+            <>
+              <Button type="primary" onClick={() => handleEdit(record)}>
+                编辑
+              </Button>
 
-          <Button danger onClick={() => handleDelete(record.id)}>
-            删除
-          </Button>
-
+              <Button danger onClick={() => handleDelete(record.id)}>
+                删除
+              </Button>
+            </>
+          )}
         </Space>
       ),
     },
@@ -176,16 +176,18 @@ function AttachmentManager({ draftId }) {
       <h2 style={{ marginBottom: 16 }}>附件管理</h2>
 
       {/* 上传组件 */}
-      <Upload
-        name="file"
-        beforeUpload={beforeUpload}
-        customRequest={customUpload}
-        showUploadList={false} // 不使用 antd 默认列表渲染
-      >
-        <Button icon={<UploadOutlined />} type="primary" style={{ marginBottom: 16 }}>
-          点击上传
-        </Button>
-      </Upload>
+      {canModify && (
+        <Upload
+          name="file"
+          beforeUpload={beforeUpload}
+          customRequest={customUpload}
+          showUploadList={false} // 不使用 antd 默认列表渲染
+        >
+          <Button icon={<UploadOutlined />} type="primary" style={{ marginBottom: 16 }}>
+            点击上传
+          </Button>
+        </Upload>
+      )}
 
       {/* 附件列表表格 */}
       <Table
@@ -199,12 +201,17 @@ function AttachmentManager({ draftId }) {
       <Modal
         title="修改附件名"
         open={editorOpen}
-        onOk={()=>handleChangeFileName()}
-        onCancel={()=>setEditorOpen(false)}
+        onOk={() => handleChangeFileName()}
+        onCancel={() => setEditorOpen(false)}
       >
-        <Form  layout="vertical">
-            <label>名称: </label>
-            <input className='w-full p-2' value={currentName} onChange={(e)=>{setCurrentName(e.target.value)}}></input>
+        <Form layout="vertical">
+          <Form.Item label="名称">
+            <input
+              className='w-full p-2'
+              value={currentName}
+              onChange={(e) => { setCurrentName(e.target.value) }}
+            />
+          </Form.Item>
         </Form>
       </Modal>
 
@@ -238,5 +245,9 @@ function AttachmentManager({ draftId }) {
     </div>
   );
 }
+
+AttachmentManager.defaultProps = {
+  canModify: true,
+};
 
 export default AttachmentManager;
