@@ -12,14 +12,14 @@ import CommentForm from './CommentBox';
 
 const PAGE_SIZE = 5; // 每页显示五条顶级评论
 
-const CommentSection: React.FC = () => {
+const MyComment: React.FC = () => {
     const [topComments, setTopComments] = useState<commentDetails[]>([]);
     const [replys, setReplys] = useState<{ [key: number]: commentDetails[] }>({});
     const [userDetails, setUserDetails] = useState<{ [key: number]: User }>({});
     const [commentMap, setCommentMap] = useState<{ [key: number]: commentDetails }>({});
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const { auth } = useAuth() as { auth: userwithRoles };
+    const { auth } = useAuth();
     const defaultAvatar = '/default-avatar.png';
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -58,7 +58,7 @@ const CommentSection: React.FC = () => {
     // Fetch top-level comments
     const fetchTopComment = async () => {
         try {
-            const response = await request.get<{ success: boolean; data: commentDetails[] }>(`/comment/articleId`);
+            const response = await request.get<{ success: boolean; data: commentDetails[] }>(`/comment/userId`,{params:{userId:auth?.idUser}});
             if (response.data.success) {
                 const comments: commentDetails[] = response.data.data;
                 setTopComments(comments);
@@ -147,49 +147,6 @@ const CommentSection: React.FC = () => {
         }
     };
 
-    // Handle submitting a top-level comment
-    const handleSubmitTopComment = async (content: string) => {
-        if (!content.trim()) {
-            alert("Comment content cannot be empty!");
-            return;
-        }
-        try {
-            const comment: commentDetails = {
-                id: 0,
-                userId: auth?.idUser as number,
-                comment: content.trim(),
-                parentId: 0,
-                rootCommentId: 0,
-                createdAt: formatDate(new Date()),
-                updatedAt: formatDate(new Date()),
-            };
-
-            const response = await request.post(`/comment/add`, comment);
-
-            if (response.data.success) {
-                const newComment: commentDetails = {
-                    ...comment,
-                    id: Date.now(), // 使用时间戳模拟唯一 ID
-                };
-
-                setTopComments((prev) => [newComment, ...prev]);
-                setTotalPages(Math.ceil((topComments.length + 1) / PAGE_SIZE));
-                // 如果当前页是第一页，则添加新评论到当前页
-                if (currentPage === 1) {
-                    // 确保只显示 PAGE_SIZE 条评论
-                    setTopComments((prev) => [newComment, ...prev].slice(0, PAGE_SIZE));
-                }
-                storeCommentsInMap([newComment]);
-                await fetchUserDetails(newComment.userId);
-            } else {
-                alert("Failed to submit comment. Please try again.");
-            }
-        } catch (error) {
-            console.error("Failed to submit comment:", error);
-            alert("Failed to submit comment. Please try again.");
-        }
-    };
-
     const getCurrentPageComments = () => {
         const start = (currentPage - 1) * PAGE_SIZE;
         const end = start + PAGE_SIZE;
@@ -202,25 +159,15 @@ const CommentSection: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchTopComment();
+        if(auth){
+            fetchTopComment();
+        }
+        
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [auth]);
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-800">在线问答</h2>
-                </div>
-            {/* 新评论表单 */}
-            {auth?.scope[0] === 4 && (
-                <div className="mb-6">
-                    <CommentForm
-                        onSubmit={handleSubmitTopComment}
-                        placeholder="发表评论..."
-                    />
-                </div>
-            )}
-
             {/* 顶级评论列表 */}
             <div className="space-y-4">
                 {getCurrentPageComments().map((comment) => {
@@ -287,4 +234,4 @@ const CommentSection: React.FC = () => {
     );
 };
 
-export default CommentSection;
+export default MyComment;

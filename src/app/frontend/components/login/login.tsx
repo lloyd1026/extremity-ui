@@ -1,5 +1,5 @@
 'use client'; // 确保这是一个 Client Component
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import request from "@/utils/request";
 const LoginPage = () => {
@@ -7,13 +7,18 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const handleLogin = async () => {
+    const response1 = await request.get(`/user/role`,{params:{email:account}})
+
+    if(response1.data.data==1){
+      const response = await request.post(`/auth/login`,{account,password})
+      if (response.data.success) {
+        localStorage.setItem('token',response.data.data.token);
+        localStorage.setItem('refreshToken',response.data.data.refreshToken);
+        router.push('/frontend'); // 登录成功后跳转到目标页面
+      }
+    }
     // 在这里模拟登录验证
-    const response = await request.post(`/auth/login`,{account,password})
-    if (response.data.success) {
-      localStorage.setItem('token',response.data.data.token);
-      localStorage.setItem('refreshToken',response.data.data.refreshToken);
-      router.push('/frontend'); // 登录成功后跳转到目标页面
-    } else {
+     else {
       alert('登录失败');
     }
   };
@@ -109,7 +114,7 @@ const LoginPage = () => {
             </a>
           </p>
           <p className="mt-10 text-center text-sm/6 text-gray-500">
-            <a href="/frontend/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
+            <a href="/frontend/admitted-status" className="font-semibold text-indigo-600 hover:text-indigo-500">
               查看申请状态
             </a>
           </p>
