@@ -1,10 +1,12 @@
 export interface User{
+    idUser:number;
     email:string;
     account:string;
     realName:string;
     phone:string;
     sex:string;
     avatarUrl:string;
+    nickName:string;
 }
 
 

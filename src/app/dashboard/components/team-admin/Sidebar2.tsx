@@ -73,9 +73,9 @@ const Sidebar2 = ({ isOpen, toggleSidebar }: SidebarProps) => {
                 </Link>
               </li>
 
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/chatting')}`}>
+              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/chat-online')}`}>
                 <FaCommentDots className="mr-4 text-xl text-black" /> {/* 使用 FaCommentDots 替代 FaCogs */}
-                <Link href="/dashboard/team-admin/chatting" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/team-admin/chat-online" className="text-lg text-black hover:text-purple-900">
                   在线交流与反馈
                 </Link>
               </li>

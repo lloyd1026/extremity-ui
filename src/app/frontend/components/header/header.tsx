@@ -24,8 +24,9 @@ const Header = () => {
 
   const navigation = [
     { name: '主页', href: '/frontend', current: false },
-    { name: '分类', href: '#', current: false },
+    { name: '分类', href: '/frontend/classification', current: false },
     { name : '在线论坛',href: '/frontend/comment',current:false},
+    { name : '团队信息',href: '/frontend/team',current:false},
   ]
 
   function classNames(...classes: (string | undefined)[]) {
@@ -92,7 +93,6 @@ const Header = () => {
                   <div className="hidden sm:ml-6 sm:block">
                     <div className="flex space-x-4">
                       {updatedNavigation.map((item) => {
-                        if(item.role===undefined||auth?.scope.includes(item.role)){
                           return (
                             <Link
                               key={item.name}
@@ -106,7 +106,6 @@ const Header = () => {
                               {item.name}
                             </Link>
                             )
-                      }
                     }
                     )
                     }
@@ -117,8 +116,8 @@ const Header = () => {
 
 
             {/* Profile dropdown */}
-            <Menu as="div" className="relative ml-3">
-              <div>
+            <Menu as="div" className="relative ml-3 z-50">
+              <div >
                 <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
@@ -134,23 +133,22 @@ const Header = () => {
 
               <MenuItems
                 transition
-                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
               >
-                <MenuItem>
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
-                  >
-                    文章管理
-                  </Link>
-                </MenuItem>
-
                 <MenuItem>
                   <Link
                     href="/frontend/profile"
                     className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
                   >
                     设置
+                  </Link>
+                </MenuItem>
+                <MenuItem>
+                  <Link
+                    href="/frontend/my-comment"
+                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                  >
+                    我的反馈
                   </Link>
                 </MenuItem>
                 <Menu.Item>

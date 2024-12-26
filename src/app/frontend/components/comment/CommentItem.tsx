@@ -36,45 +36,50 @@ const CommentItem: React.FC<CommentItemProps> = ({
     };
 
     return (
-        <div 
-            style={{ marginBottom: "20px", border: "1px solid #ccc", padding: "10px" }}
-        >
+        <div className="mb-5 border border-gray-300 p-4 rounded-md bg-white shadow-sm">
             {/* Comment Header */}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+            <div className="flex items-start mb-2">
                 <UserAvatar user={user} />
-                <div>
-                    <span style={{ color: "gray", fontWeight: 'bold' }}>
+                <div className="ml-3 flex-1">
+                    <span className="text-gray-700 font-semibold">
                         {user.account || "Anonymous"}
                     </span>
-                    <br />
-                    {comment.comment}
-                    <br />
+                    <p className="mt-1 text-gray-800">{comment.comment}</p>
                 </div>
             </div>
-            <div style={{ color: "gray" }}>
+            {/* Timestamp */}
+            <div className="text-sm text-gray-500">
                 {formatTimestamp(comment.updatedAt)}
             </div>
-            {/* Toggle Replies */}
-            <button onClick={() => onToggleReplies(comment.id)}>
-                {replies ? "隐藏回复" : "展开回复"}
-            </button>
-            {/* Reply Button */}
-            {/* Assuming `auth?.scope[0] === 3` is handled in parent or passed as a prop */}
-            {
-                auth?.scope[0]===3&&(
-                <button onClick={() => setIsReplying(!isReplying)} style={{ marginLeft: '10px' }}>
-                    回复
+            {/* Actions */}
+            <div className="flex items-center mt-2">
+                <button
+                    onClick={() => onToggleReplies(comment.id)}
+                    className="text-blue-500 hover:text-blue-700 text-sm focus:outline-none"
+                    aria-expanded={replies ? "true" : "false"}
+                >
+                    {replies ? "隐藏回复" : "展开回复"}
                 </button>
-                )
-            }
-            
+                {
+                    auth?.scope[0] === 2 && (
+                        <button
+                            onClick={() => setIsReplying(!isReplying)}
+                            className="ml-4 text-blue-500 hover:text-blue-700 text-sm focus:outline-none"
+                        >
+                            回复
+                        </button>
+                    )
+                }
+            </div>
             {/* Reply Form */}
             {isReplying && (
-                <CommentForm
-                    onSubmit={handleReply}
-                    onCancel={() => setIsReplying(false)}
-                    placeholder="输入你的回复"
-                />
+                <div className="mt-4">
+                    <CommentForm
+                        onSubmit={handleReply}
+                        onCancel={() => setIsReplying(false)}
+                        placeholder="输入你的回复"
+                    />
+                </div>
             )}
             {/* Replies */}
             {replies && replies.length > 0 && (
