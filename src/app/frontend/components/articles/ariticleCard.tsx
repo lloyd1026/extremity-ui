@@ -15,7 +15,7 @@ const Card: React.FC<CardProps> = ({ title, imageUrl, tag, date, description, li
     <div className="flex justify-center p-4">
       <div className="max-w-xs bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="relative">
-          <div className="w-full h-36 bg-gray-200 p-3">
+          <div className=" relative w-full h-36 bg-gray-200 p-3">
             <img
               src={imageUrl}
               alt={title}

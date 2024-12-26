@@ -108,6 +108,11 @@ const LoginPage = () => {
               快来注册一个吧
             </a>
           </p>
+          <p className="mt-10 text-center text-sm/6 text-gray-500">
+            <a href="/frontend/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
+              查看申请状态
+            </a>
+          </p>
         </div>
       </div>
     </>
