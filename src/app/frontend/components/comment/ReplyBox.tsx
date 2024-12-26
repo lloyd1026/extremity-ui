@@ -44,7 +44,7 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, user, parentAccount, onRep
                 {formatTimestamp(reply.updatedAt)}
             </div>
             {/* Actions */}
-            {auth?.scope[0] === 3 && (
+            {auth?.scope[0] === 2 && (
                 <div className="mt-2">
                     <button
                         onClick={() => setShowReplyForm(!showReplyForm)}

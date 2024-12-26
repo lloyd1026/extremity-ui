@@ -61,7 +61,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                     {replies ? "隐藏回复" : "展开回复"}
                 </button>
                 {
-                    auth?.scope[0] === 3 && (
+                    auth?.scope[0] === 2 && (
                         <button
                             onClick={() => setIsReplying(!isReplying)}
                             className="ml-4 text-blue-500 hover:text-blue-700 text-sm focus:outline-none"
