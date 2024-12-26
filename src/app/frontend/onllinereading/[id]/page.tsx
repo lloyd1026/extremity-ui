@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import AttachmentManager from '../../components/articlecontentEditor/attachmentManager';
+import AttachmentManager from '../../../../components/articlecontentEditor/attachmentManager';
 
 const ArticleContentPage = () => {
   const params = useParams(); // Access params as a Promise

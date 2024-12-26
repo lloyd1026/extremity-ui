@@ -4,8 +4,6 @@ import { ReactNode, useState, useEffect} from 'react';
 import Sidebar from '@/app/dashboard/components/team-admin/Sidebar2';
 import UserHeader from '@/app/dashboard/components/team-admin/Header';
 
-import { useRouter } from 'next/navigation';
-import AuthGuard from '@/utils/AuthGard';
 // import { AuthProvider } from '@/app/dashboard/components/auth/authcontext'; // 确保路径正确
 
 interface TeamAdminLayoutProps {
@@ -14,15 +12,6 @@ interface TeamAdminLayoutProps {
 
 const TeamAdminLayout = ({ children }: TeamAdminLayoutProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // 控制侧边栏展开/收起
-
-  // 路由保护
-  const router = useRouter();
-  // 路由保护逻辑
-  useEffect(() => {
-    // 使用 AuthGuard 类来检查用户是否有有效的 token
-    console.log("客户端路由保护");
-    AuthGuard.checkAuth(router);
-  }, [router]);
 
   // 切换侧边栏状态的函数
   const toggleSidebar = () => {

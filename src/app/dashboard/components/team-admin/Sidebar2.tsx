@@ -52,17 +52,17 @@ const Sidebar2 = ({ isOpen, toggleSidebar }: SidebarProps) => {
                 </Link>
               </li>
               
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/results')}`}>
+              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/achievementManagement')}`}>
                 <FaPaperPlane className="mr-4 text-xl text-black" /> {/* 使用 FaPaperPlane 替代 FaShieldAlt */}
-                <Link href="/dashboard/team-admin/results" className="text-lg text-black hover:text-purple-900">
-                  成果管理与发布
+                <Link href="/dashboard/team-admin/achievementManagement" className="text-lg text-black hover:text-purple-900">
+                  所有成果管理
                 </Link>
               </li>
 
-              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/content')}`}>
+              <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/editor')}`}>
                 <FaClipboardList className="mr-4 text-xl text-black" />
-                <Link href="/dashboard/team-admin/content" className="text-lg text-black hover:text-purple-900">
-                  文章管理
+                <Link href="/dashboard/team-admin/editor" className="text-lg text-black hover:text-purple-900">
+                  个人成果管理
                 </Link>
               </li>
 

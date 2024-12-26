@@ -1,19 +1,18 @@
 "use client";
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Editor, EditorRef } from "@/components/editor";
 import { browserFileTable } from "@/components/editor/lib/browser-file-table";
 import instance from "@/utils/request";
 import { toast } from "react-toastify";
 import Modal from "antd/es/modal/Modal";
 import "react-toastify/dist/ReactToastify.css";
-import Loading from "../loading/loading";
+import Loading from "../../app/frontend/components/loading/loading";
 import { Form, Input, Select, Upload, Button } from "antd";
 import type { UploadProps } from "antd/es/upload";
 import { UploadOutlined } from "@ant-design/icons";
 import config from "@/config/baseurl_config";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import AttachmentManager from "./attachmentManager";
-import { useSharedState, useUpdateSharedState } from "./sharedContext";
 
 // 文章类型枚举
 const articleTypeOptions = [
@@ -56,7 +55,6 @@ function processImages(node: any, imageMap: Record<string, File>) {
         imageMap[uploadKey] = file; // 在映射表中保存 File
       } catch (error) {
         console.error("Base64 转换失败", error);
-
       }
     } else if (browserFileTable[src]) {
       const file = browserFileTable[src];
@@ -85,7 +83,6 @@ interface ArticleInfo {
 export default function Content({ id }: { id: string }) {
   const editorRef = useRef<EditorRef>(null);
 
-  const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
@@ -95,49 +92,126 @@ export default function Content({ id }: { id: string }) {
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
   const [articleInfo, setArticleInfo] = useState<ArticleInfo | null>(null);
-
-  const sharedState = useSharedState();
-  const setSharedState = useUpdateSharedState();
-
   // AntD 表单
   const [form] = Form.useForm();
+  const pathname = usePathname();
 
-  const route = useRouter();
+  const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [contentData, setContentData] = useState<any>(null);
 
   /**
-   * 1. 获取文章的“正文”内容（草稿JSON），并回显到编辑器中
+   * 获取文章的“正文”内容（草稿JSON），并存储到 contentData 中
    */
-  useEffect(() => {
-    const getContent = async () => {
-      try {
-        const response = await instance.get(`/article/Draft/${id}`);
-        if(!editorRef.current){
-          return
-        }
-        if (!response || !response.data.success) {
-          toast.error("获取内容失败！请稍后重试！");
-          return;
-        }
-        const editor = editorRef.current.getEditor();
-        editor.commands.setContent(response.data.data);
-      } catch (error: any) {
-        console.log(error)
-        toast.error("获取内容异常！");
+  const getContent = async () => {
+    try {
+      console.log("Fetching content for id:", id);
+      const response = await instance.get(`/article/Draft/${id}`);
+      if (!response || !response.data.success) {
+        toast.error("获取内容失败！请稍后重试！");
+        return;
       }
-    };
+      console.log("Content fetched:", response.data.data);
+      setContentData(response.data.data);
+    } catch (error: any) {
+      console.log("Error fetching content:", error);
+      toast.error("获取内容异常！");
+    }
+  };
 
-    const fetchData = async () => {
+  /**
+   * 获取文章的摘要、类型、标签、封面等信息
+   */
+  const fetchArticleInfo = async () => {
+    try {
+      console.log("Fetching article info for id:", id);
+      const response = await instance.get(`/article/DraftCompendium/${id}`);
+      if (!response.data.success) {
+        toast.error("获取信息失败");
+        return false;
+      }
+      console.log("Article info fetched:", response.data.data);
+      setArticleInfo(response.data.data);
+      if (isOpen) {
+        // 延迟设置表单字段值，避免在渲染期间同步更新状态
+        Promise.resolve().then(() => {
+          form.setFieldsValue({
+            summary: response.data.data.articlePreviewContent,
+            articleType: Number(response.data.data.articleType) || 0,
+            tags: response.data.data.articleTags
+              ? response.data.data.articleTags.split(",")
+              : [],
+          });
+        });
+      }
+      // 封面预览
+      const thumbnailUrl = response.data.data.articleThumbnailUrl;
+      if (thumbnailUrl) {
+        setCoverUrl(config.baseUrl + thumbnailUrl);
+      } else {
+        setCoverUrl(null);
+      }
+      setCoverFile(null);
+      return true;
+    } catch (error: any) {
+      console.log("Error fetching article info:", error);
+      toast.error(error.response?.data?.message || "获取信息失败");
+      return false;
+    }
+  };
+
+  /**
+   * 综合获取文章信息和内容
+   */
+  const fetchData = async () => {
+    console.log("Fetching data...");
+    setLoading(true);
+    try {
       await fetchArticleInfo();
       await getContent();
-      setIsMounted(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // 初始加载
+    fetchData();
+
+    // 定义窗口获取焦点时的处理函数
+    const handleFocus = () => {
+      console.log("Window focused, fetching data...");
+      fetchData();
     };
 
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, sharedState]);
+    // 监听窗口的 focus 事件
+    window.addEventListener("focus", handleFocus);
+
+    // 清理事件监听
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [id, pathname]);
 
   /**
-   * 2. 保存富文本内容：把所有图片抽取并用 FormData 上传
+   * 设置编辑器内容，当 contentData 和 editorRef.current 都准备好
+   */
+  useEffect(() => {
+    if (contentData && editorRef.current) {
+      const editor = editorRef.current.getEditor();
+      if (editor) {
+        console.log("Setting editor content");
+        // 延迟设置内容，避免在渲染周期内调用 flushSync
+        Promise.resolve().then(() => {
+          editor.commands.setContent(contentData);
+        });
+      }
+    }
+  }, [contentData]);
+
+  /**
+   * 点击“保存富文本内容”按钮
    */
   const handleUpload = async () => {
     if (!editorRef.current) return;
@@ -181,36 +255,8 @@ export default function Content({ id }: { id: string }) {
   };
 
   /**
-   * 3. 点击“编辑文章详细信息”按钮时，先获取文章的摘要、类型、标签、封面等，再回显到 Form 表单
+   * 点击“编辑文章详细信息”按钮
    */
-  const fetchArticleInfo = async () => {
-    try {
-      const response = await instance.get(`/article/DraftCompendium/${id}`);
-      if (!response.data.success) {
-        toast.error("获取信息失败");
-        return false;
-      }
-      setArticleInfo(response.data.data);
-      form.setFieldsValue({
-        summary: response.data.data.articlePreviewContent,
-        articleType: Number(response.data.data.articleType) || 0,
-        tags: response.data.data.articleTags ? response.data.data.articleTags.split(",") : [],
-      });
-      // 封面预览
-      const thumbnailUrl = response.data.data.articleThumbnailUrl;
-      if (thumbnailUrl) {
-        setCoverUrl(config.baseUrl + thumbnailUrl);
-      } else {
-        setCoverUrl(null);
-      }
-      setCoverFile(null);
-      return true;
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "获取信息失败");
-      return false;
-    }
-  };
-
   const handleEdit = async () => {
     const res = await fetchArticleInfo();
     if (res === true) {
@@ -219,8 +265,8 @@ export default function Content({ id }: { id: string }) {
   };
 
   /**
-   * 4. Modal 中“确定”按钮
-   *    将摘要、类型、标签、封面等一起上传到后端
+   * Modal 中“确定”按钮
+   * 将摘要、类型、标签、封面等一起上传到后端
    */
   const handleOk = async () => {
     try {
@@ -241,12 +287,8 @@ export default function Content({ id }: { id: string }) {
       if (coverFile) {
         formData.append("coverFile", coverFile);
       }
-
       setConfirmLoading(true);
-
-      // 3) 发请求
       const response = await instance.post("/article/DraftCompendium", formData);
-
       if (response.data.success) {
         toast.success("文章信息更新成功！");
         setIsOpen(false);
@@ -261,7 +303,8 @@ export default function Content({ id }: { id: string }) {
       }
     } catch (error: any) {
       // 如果是表单没通过校验，会直接抛异常到这里
-      const errorMsg = error.response?.data?.message || "请检查必填项是否填写完整";
+      const errorMsg =
+        error.response?.data?.message || "请检查必填项是否填写完整";
       toast.error(errorMsg);
     } finally {
       setConfirmLoading(false);
@@ -271,38 +314,6 @@ export default function Content({ id }: { id: string }) {
   // 取消按钮
   const handleCancel = () => {
     setIsOpen(false);
-  };
-
-  const handleDoAudit = async () => {
-    try {
-      const response = await instance.get(`/article/doAudit/${id}`);
-      if (response.data.success) {
-        toast.success("申请成功!");
-        setSharedState(prev => !prev);
-        fetchArticleInfo();
-      } else {
-        toast.error(response.data.message || "申请失败!");
-      }
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "申请失败!";
-      toast.error(errorMsg);
-    }
-  };
-
-  const handleUndoAudit = async () => {
-    try {
-      const response = await instance.get(`/article/undoAudit/${id}`);
-      if (response.data.success) {
-        toast.success("撤回成功!");
-        setSharedState(prev => !prev);
-        fetchArticleInfo();
-      } else {
-        toast.error(response.data.message || "撤回失败!");
-      }
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "撤回失败!";
-      toast.error(errorMsg);
-    }
   };
 
   // 封面上传组件的 props
@@ -316,12 +327,6 @@ export default function Content({ id }: { id: string }) {
     maxCount: 1,
   };
 
-  const isEditable = useMemo(() => {
-    if (!articleInfo) return true;
-    return articleInfo.articleStatus === "0";
-  }, [articleInfo]);
-
-  // 释放封面 URL
   useEffect(() => {
     if (coverFile) {
       const objectUrl = URL.createObjectURL(coverFile);
@@ -333,62 +338,20 @@ export default function Content({ id }: { id: string }) {
 
   return (
     <div className="container mx-auto">
-      {isMounted ? (
         <>
-          {isEditable && <Editor ref={editorRef} />}
-
+          <Editor ref={editorRef} />
           <div className="w-10/12 flex flex-col justify-center mt-6 gap-4">
-            {isEditable ? (
-              <>
-                <Button
-                  type="primary"
-                  onClick={handleUpload}
-                  className="h-12 w-full"
-                >
-                  保存富文本内容
-                </Button>
-
-                <Button
-                  onClick={handleEdit}
-                  className="h-12 w-full"
-                >
-                  编辑文章详细信息
-                </Button>
-
-                <Button
-                  type="primary"
-                  onClick={handleDoAudit}
-                  className="h-12 w-full"
-                >
-                  申请投递文章
-                </Button>
-              </>
-            ) : (
-              articleInfo?.articleStatus === "2" && (
-                <Button
-                  onClick={handleUndoAudit}
-                  className="h-12 w-full"
-                >
-                  撤回投递文章
-                </Button>
-              )
-            )}
-            <Button
-              onClick={() => {
-                route.push(`/frontend/preview/${id}`);
-              }}
-              className="h-12 w-full"
-            >
-              预览
+            <Button type="primary" onClick={handleUpload} className="h-12 w-full">
+              保存富文本内容
+            </Button>
+            <Button onClick={handleEdit} className="h-12 w-full">
+              编辑文章详细信息
             </Button>
           </div>
           <div className="w-10/12">
-            <AttachmentManager draftId={id} canModify={isEditable} />
+            <AttachmentManager draftId={id} canModify={true} />
           </div>
-
-          {/* 弹窗：编辑文章细则 */}
           <Modal
-            getContainer={false}
             title="编辑文章细则"
             open={isOpen}
             onOk={handleOk}
@@ -434,9 +397,13 @@ export default function Content({ id }: { id: string }) {
                 {coverFile ? (
                   <div style={{ marginBottom: 8 }}>
                     <img
-                      src={coverUrl || null}
+                      src={coverUrl || ""}
                       alt="预览封面"
-                      style={{ maxWidth: "100%", maxHeight: 200, marginBottom: 8 }}
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: 200,
+                        marginBottom: 8,
+                      }}
                     />
                     <div>{coverFile.name}</div>
                   </div>
@@ -446,7 +413,11 @@ export default function Content({ id }: { id: string }) {
                     <img
                       src={coverUrl}
                       alt="当前封面"
-                      style={{ maxWidth: "100%", maxHeight: 200, marginBottom: 8 }}
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: 200,
+                        marginBottom: 8,
+                      }}
                     />
                     <div>当前封面</div>
                   </div>
@@ -459,9 +430,6 @@ export default function Content({ id }: { id: string }) {
             </Form>
           </Modal>
         </>
-      ) : (
-        <Loading />
-      )}
     </div>
   );
 }

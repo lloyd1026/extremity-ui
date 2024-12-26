@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/articlecontentEditor/sidebar";
-import PrivateRoute from "../components/auth/privateroute";
-import Loading from "../components/loading/loading";
-import { useAuth } from "../components/auth/authcontext";
-import { SharedStateProvider } from "../components/articlecontentEditor/sharedContext";
+import Sidebar from "../../../../components/articlecontentEditor/sidebar";
+import Loading from "../../../frontend/components/loading/loading";
+import { useAuth } from "../../../frontend/components/auth/authcontext";
+import { SharedStateProvider } from "../../../../components/articlecontentEditor/sharedContext";
+import PrivateRoute from "../../components/auth/privateroute";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
@@ -16,7 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     isMounted?
-    (<PrivateRoute roles={[1]}>
+    (<PrivateRoute roles={[1,2,3]}>
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
     <SharedStateProvider>

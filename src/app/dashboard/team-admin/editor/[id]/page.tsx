@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect } from "react";
-import Content from "../../components/articlecontentEditor/content";
+import Content from "../../../../../components/articlecontentEditor/content";
 import { useParams, useRouter } from "next/navigation";
 
 export default function ArticlePage() {

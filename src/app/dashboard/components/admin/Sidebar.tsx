@@ -47,21 +47,21 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             <ul>
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/users')}`}>
                 <FaUsers className="mr-4 text-xl text-black" />
-                <Link href="users" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/admin/users" className="text-lg text-black hover:text-purple-900">
                   用户管理
                 </Link>
               </li>
               
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/permissions')}`}>
                 <FaShieldAlt className="mr-4 text-xl text-black" />
-                <Link href="permissions" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/admin/permissions" className="text-lg text-black hover:text-purple-900">
                   权限管理
                 </Link>
               </li>
 
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/admin/content')}`}>
                 <FaClipboardList className="mr-4 text-xl text-black" />
-                <Link href="content" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/admin/content" className="text-lg text-black hover:text-purple-900">
                   内容审核
                 </Link>
               </li>

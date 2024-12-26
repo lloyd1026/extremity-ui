@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
 import instance from "@/utils/request";
 import { toast } from "react-toastify";
-import { useAuth } from "../auth/authcontext";
+import { useAuth } from "@/app/dashboard/components/auth/authcontext";
 import { useSharedState,useUpdateSharedState} from "./sharedContext";
 
 interface Article {
@@ -22,6 +22,9 @@ const Sidebar = () => {
   const drafts = articles.filter((item) => item.articleStatus === "0");
   const audit = articles.filter((item) => item.articleStatus === "2");
   const published = articles.filter((item) => item.articleStatus === "1");
+  const hiden = articles.filter((item) => item.articleStatus === "5");
+  const reject = articles.filter((item) => item.articleStatus === "9");
+  const returnback = articles.filter((item) => item.articleStatus === "8");
 
   const sharedState = useSharedState();
   const setSharedState = useUpdateSharedState();
@@ -187,7 +190,7 @@ const Sidebar = () => {
       // 普通态：显示标题，双击可编辑
       return (
         <Link
-          href={`/frontend/editor/${article.idArticle}`}
+          href={`/dashboard/team-admin/editor/${article.idArticle}`}
           className="flex-1 block px-2 py-1 text-sm rounded hover:bg-gray-100"
           onDoubleClick={() => handleEditStart(article.idArticle)}
         >
@@ -256,6 +259,24 @@ const Sidebar = () => {
         <div>
           <h3 className="text-xs font-bold text-gray-600 mb-2">已发布</h3>
           <ul className="space-y-1">{renderList(published)}</ul>
+        </div>
+      )}
+            {reject.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold text-gray-600 mb-2">被拒绝</h3>
+          <ul className="space-y-1">{renderList(reject)}</ul>
+        </div>
+      )}
+          {hiden.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold text-gray-600 mb-2">隐藏状态</h3>
+          <ul className="space-y-1">{renderList(hiden)}</ul>
+        </div>
+      )}
+            {returnback.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold text-gray-600 mb-2">被打回</h3>
+          <ul className="space-y-1">{renderList(returnback)}</ul>
         </div>
       )}
     </div>
