@@ -6,6 +6,8 @@ import request from "@/utils/request";
 import AddTeamMember from "@/app/dashboard/components/team-admin/AddTeamMember";
 import config from '@/config/baseurl_config';
 import { useRouter } from "next/navigation";
+import AccountDeletionModal from '@/app/dashboard/components/team-admin/AccountDeletion'; // 导入组件
+
 
 interface UserRole {
   idUser: number;
@@ -40,6 +42,7 @@ const TeamPermissionsManage = () => {
   const usersPerPage = 10;
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const fetchRoles = async () => {
     setLoading(true);
@@ -161,6 +164,15 @@ const TeamPermissionsManage = () => {
     router.push(`/dashboard/team-admin/users/${userId}`); // 跳转到用户详情页
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+
   const totalPages = Math.ceil(userRoles.length / usersPerPage);
 
   if (loading) {
@@ -240,10 +252,21 @@ const TeamPermissionsManage = () => {
         >
           新增成员
         </button>
+
+        {/* 打开模态框的按钮 */}
+        <button
+          onClick={handleOpenModal}
+          className="px-4 py-2 text-white bg-purple-300 rounded-md hover:bg-blue-600"
+        >
+          查看注销申请
+        </button>
       </div>
 
       {/* 新增用户模态框 */}
       <AddTeamMember isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+      {/* 传递 isOpen 和 onClose 属性来控制模态框的显示 */}
+      <AccountDeletionModal isOpen={isModalOpen} onClose={handleCloseModal} />
+    
       
     
       {/* 用户列表 */}
