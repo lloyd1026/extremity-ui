@@ -5,6 +5,7 @@ import request from "@/utils/request";
 import { useRouter } from "next/navigation";
 import AddUser from "@/app/dashboard/components/admin/AddUser";
 import RoleSelector from "@/app/dashboard/components/admin/RoleSelector";
+import config from '@/config/baseurl_config';
 
 interface User {
   idUser: number;
@@ -139,13 +140,12 @@ const UserList = () => {
           >
             {/* 头像 */}
             <Image
-              src={user.avatarUrl || "/images/default-avatar.jpg"}
-              alt="Avatar"
-              width={48}
-              height={48}
-              className="w-12 h-12 rounded-full mr-4"
+              src={user?.avatarUrl ? `${config.imageUrl}${user.avatarUrl}` : "/images/default-avatar.jpg"}
+              alt="用户头像"
+              width={40}
+              height={40}
+              className="rounded-full"
             />
-
             {/* 用户信息 */}
             <div className="flex-1 flex items-center space-x-6">
               <button

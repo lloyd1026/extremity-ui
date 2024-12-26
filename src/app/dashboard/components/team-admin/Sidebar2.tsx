@@ -17,6 +17,7 @@ const Sidebar2 = ({ isOpen, toggleSidebar }: SidebarProps) => {
       ? 'bg-purple-300 text-white hover:bg-purple-300'  // 高亮当前页面按钮，使用淡紫色
       : 'hover:bg-purple-50 text-black';  // 默认按钮样式，使用淡紫色的hover效果
   };
+  
 
   return (
     <div className="relative">
@@ -46,35 +47,35 @@ const Sidebar2 = ({ isOpen, toggleSidebar }: SidebarProps) => {
             <ul>
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/team-info')}`}>
                 <FaUsers className="mr-4 text-xl text-black" />
-                <Link href="team-info" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/team-admin/team-info" className="text-lg text-black hover:text-purple-900">
                   团队管理
                 </Link>
               </li>
               
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/results')}`}>
                 <FaPaperPlane className="mr-4 text-xl text-black" /> {/* 使用 FaPaperPlane 替代 FaShieldAlt */}
-                <Link href="results" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/team-admin/results" className="text-lg text-black hover:text-purple-900">
                   成果管理与发布
                 </Link>
               </li>
 
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/content')}`}>
                 <FaClipboardList className="mr-4 text-xl text-black" />
-                <Link href="content" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/team-admin/content" className="text-lg text-black hover:text-purple-900">
                   文章管理
                 </Link>
               </li>
 
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/users')}`}>
                 <FaCogs className="mr-4 text-xl text-black" />
-                <Link href="users" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/team-admin/users" className="text-lg text-black hover:text-purple-900">
                   用户管理
                 </Link>
               </li>
 
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/chatting')}`}>
                 <FaCommentDots className="mr-4 text-xl text-black" /> {/* 使用 FaCommentDots 替代 FaCogs */}
-                <Link href="chatting" className="text-lg text-black hover:text-purple-900">
+                <Link href="/dashboard/team-admin/chatting" className="text-lg text-black hover:text-purple-900">
                   在线交流与反馈
                 </Link>
               </li>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import request from "@/utils/request";
+import config from '@/config/baseurl_config';
 
 interface UserRole {
   idUser: number;
@@ -160,7 +161,7 @@ const PermissionsManage = () => {
           >
             {/* 头像 */}
             <Image
-              src={user.avatarUrl || "/images/default-avatar.jpg"} // 默认头像路径
+              src={user?.avatarUrl ? `${config.imageUrl}${user.avatarUrl}` : "/images/default-avatar.jpg"}
               alt="用户头像"
               width={40}
               height={40}

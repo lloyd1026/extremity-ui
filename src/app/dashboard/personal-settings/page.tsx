@@ -1,196 +1,226 @@
 "use client";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { PhotoIcon} from '@heroicons/react/24/solid';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import request from "@/utils/request";
+import { User } from "@/app/frontend/components/info";
+import { useAuth } from '@/app/dashboard/components/auth/authcontext';
+import Loading from "@/app/frontend/components/loading/loading";
+import config from '@/config/baseurl_config';
 
-interface UserInfoDTO {
-  idUser: number;
-  account: string;
-  avatarUrl: string;
-  nickname: string;
-  email: string;
-  phone?: string;
-  status: string;
-  sex: string;
-  signature?: string;
-  lastLoginTime: string;
-  lastOnlineTime: string;
-  createdTime: string;
-}
+const PersonalSetting = () => {
+  const [image, setImage] = useState<File | null>(null); // 存储选择的图片
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // 存储预览图片的URL
+  const [account, setAccount] = useState<string>(''); // 存储姓名
+  const [name, setName] = useState<string>(''); // 存储姓名
+  const [gender, setGender] = useState<string>(''); // 存储性别
+  const [phone, setPhone] = useState<string>(''); // 存储电话号码
+  const [user, setUser] = useState<User |null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const { auth } = useAuth();
 
-const PersonalSettings = () => {
-  const searchParams = useSearchParams();
-  const idUser = searchParams.get("idUser");
-  const [userInfo, setUserInfo] = useState<UserInfoDTO | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    if (idUser) {
-      fetchUserInfo(Number(idUser));
+  const fetchUser = async()=>{
+    try{
+          const response = await request.get(`/user/email`,{params:{email:auth?.account}})
+          if(response.data.success){
+            console.log(response.data.data)
+            setUser(response.data.data);
+          }
     }
-  }, [idUser]);
-
-  const fetchUserInfo = async (userId: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await request.get(`/admin/user/show-user-info`, {
-        params: { idUser: userId },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (response.data.success) {
-        setUserInfo(response.data.data);
-      } else {
-        setError("无法加载用户详细信息");
-        console.log(error);
-      }
-    } catch (err) {
-      console.error(err);
-      setError("请求失败，请稍后重试");
-    } finally {
-      setLoading(false);
+    catch(error){
+      console.log(error);      
+      setUser(null);
     }
-  };
+  }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    if (userInfo) {
-      setUserInfo({ ...userInfo, [name]: value });
-    }
-  };
+  useEffect(()=>{
+    fetchUser();
+    console.log(config.imageUrl+user?.avatarUrl)
+    setIsMounted(true)
+  },[auth])
 
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
-      const avatarUrl = URL.createObjectURL(file);
-      if (userInfo) {
-        setUserInfo({ ...userInfo, avatarUrl });
-      }
-      setMessage("头像已成功上传！");
+      setImage(file);
+      const fileReader = new FileReader();
+      fileReader.onloadend = () => {
+        setImagePreview(fileReader.result as string); // 设置图片预览
+        
+      };
+      fileReader.readAsDataURL(file); // 读取图片文件为Data URL
     }
   };
+
+  // 向后端发送头像、姓名、性别和电话号码
+  const handleSave = async () => {
+    const formData = new FormData();
+    if (image) {
+      formData.append('file', image); // 将图片文件添加到FormData
+    }
+    if (user?.email) {
+      formData.append('email', user.email);
+    }
+    formData.append('account', account); // 添加姓名到FormData
+    formData.append('name', name); // 添加姓名到FormData
+    formData.append('sex', gender); // 添加性别到FormData
+    formData.append('phone', phone); // 添加电话号码到FormData
+
+    const response = await request.post('/user/upload-avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    
+    if (response.data.success) {
+      alert('添加成功');
+    } else {
+      alert('添加失败');
+    }
+  };
+
+  const currentImage = () => {
+    if (imagePreview === null) {
+      if (user && user.avatarUrl) {
+        return `${config.imageUrl}${user.avatarUrl}`;
+      }
+      return "/images/default-avatar.jpg"; // 默认头像
+    } else {
+      return imagePreview; // 直接返回 Data URL
+    }
+  }
+  
 
   return (
-    <div className="container max-w-3xl mx-auto p-6 rounded-lg shadow-lg bg-gray-100">
-      <h1 className="text-xl font-bold mb-4 text-center">个人设置</h1>
-      
-      <div className="flex justify-center mb-6">
-        <div className="relative">
-          {userInfo?.avatarUrl ? (
+      (isMounted&&user!==null)?
+    (<div className="max-w-xl mx-auto p-6">
+
+      <div className="col-span-full">
+        <label htmlFor="photo" className="block text-sm font-medium text-gray-900">
+          头像
+        </label>
+
+        <div className="mt-2 flex justify-center items-center gap-x-3">
             <Image
-              src={userInfo?.avatarUrl}
-              alt="用户头像"
-              width={100}
-              height={100}
-              className="rounded-full border-2 border-gray-300 cursor-pointer"
-              onClick={handleAvatarClick}
+              src={currentImage() || "/images/default-avatar.jpg"}
+              alt="Avatar Preview"
+              className="h-24 w-24 rounded-full object-cover"
+              width={96}
+              height={96}
             />
-          ) : (
-            <div
-              className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 cursor-pointer"
-              onClick={handleAvatarClick}
-            >
-              点击上传头像
+        </div>
+
+      </div>
+
+      {/* 上传文件部分 - 调整大小 */}
+      <div className="col-span-full mt-6">
+        <label htmlFor="cover-photo" className="block text-sm font-medium text-gray-900">
+          修改头像
+        </label>
+        <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-1.5 py-2">
+          <div className="text-center">
+            <PhotoIcon aria-hidden="true" className="mx-auto h-10 w-10 text-gray-300" />
+            <div className="mt-4 flex text-sm text-gray-600">
+              <label
+                htmlFor="file-upload"
+                className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+              >
+                <span>上传文件</span>
+                <input
+                  id="file-upload"
+                  name="file-upload"
+                  type="file"
+                  className="sr-only"
+                  onChange={handleFileChange}
+                />
+              </label>
+              <p className="p1-1">PNG, JPG, GIF 最大10MB</p>
             </div>
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={handleFileChange}
-          />
+          </div>
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-6 shadow-md space-y-5">
-        <div className="flex items-center">
-          <label className="font-semibold w-24">昵称:</label>
-          <input
-            type="text"
-            name="nickname"
-            value={userInfo?.nickname || ""}
-            onChange={handleInputChange}
-            className="border rounded-lg px-3 py-1 flex-1"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="font-semibold w-24">邮箱:</label>
-          <input
-            type="email"
-            name="email"
-            value={userInfo?.email || ""}
-            onChange={handleInputChange}
-            className="border rounded-lg px-3 py-1 flex-1"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="font-semibold w-24">手机号:</label>
-          <input
-            type="text"
-            name="phone"
-            value={userInfo?.phone || ""}
-            onChange={handleInputChange}
-            className="border rounded-lg px-3 py-1 flex-1"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="font-semibold w-24">状态:</label>
-          <select
-            name="status"
-            value={userInfo?.status || ""}
-            onChange={handleInputChange}
-            className="border rounded-lg px-3 py-1 flex-1"
-          >
-            <option value="1">活跃</option>
-            <option value="0">禁用</option>
-          </select>
-        </div>
-        <div className="flex items-center">
-          <label className="font-semibold w-24">性别:</label>
-          <select
-            name="sex"
-            value={userInfo?.sex || ""}
-            onChange={handleInputChange}
-            className="border rounded-lg px-3 py-1 flex-1"
-          >
-            <option value="1">男</option>
-            <option value="0">女</option>
-          </select>
-        </div>
-        <div className="flex items-center">
-          <label className="font-semibold w-24">签名:</label>
-          <input
-            type="text"
-            name="signature"
-            value={userInfo?.signature || ""}
-            onChange={handleInputChange}
-            className="border rounded-lg px-3 py-1 flex-1"
-          />
-        </div>
-
-        <div className="text-center mt-4">
-          <button
-            className="bg-purple-300 text-white px-4 py-2 rounded shadow hover:bg-purple-500"
-            disabled={loading}
-          >
-            {loading ? "保存中..." : "保存"}
-          </button>
-          {message && <p className="text-green-500 mt-2">{message}</p>}
-        </div>
+      {/* 姓名输入部分 */}
+      <div className="col-span-full mt-6">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-900">
+          用户名
+        </label>
+        <input
+          type="text"
+          id="account"
+          name="account"
+          value={account||(user?.account)||""}
+          onChange={(e) => setAccount(e.target.value)}
+          className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="请输入您的用户名"
+        />
       </div>
-    </div>
+
+      {/* 姓名输入部分 */}
+      <div className="col-span-full mt-6">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-900">
+          姓名
+        </label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={name||user?.realName||""}
+          onChange={(e) => setName(e.target.value)}
+          className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="请输入您的姓名"
+        />
+      </div>
+
+      {/* 性别输入部分 */}
+      <div className="col-span-full mt-6">
+        <label htmlFor="gender" className="block text-sm font-medium text-gray-900">
+          性别
+        </label>
+        <select
+          id="gender"
+          name="gender"
+          value={gender||user?.sex||""}
+          onChange={(e) => setGender(e.target.value)}
+          className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="">请选择性别</option>
+          <option value="1">男</option>
+          <option value="0">女</option>
+        </select>
+      </div>
+
+      {/* 电话号码输入部分 */}
+      <div className="col-span-full mt-6">
+        <label htmlFor="phone" className="block text-sm font-medium text-gray-900">
+          电话号码
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          value={phone||user?.phone||""}
+          onChange={(e) => setPhone(e.target.value)}
+          className="mt-2 block w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="请输入您的电话号码"
+        />
+      </div>
+
+      {/* 保存按钮 */}
+      <div className="mt-6 text-center">
+        <button
+          onClick={handleSave}
+          className="px-6 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          保存
+        </button>
+      </div>
+    </div>):
+    (
+      <Loading/>
+    )
   );
 };
 
-export default PersonalSettings;
+export default PersonalSetting;
