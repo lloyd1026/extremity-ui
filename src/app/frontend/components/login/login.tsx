@@ -8,7 +8,8 @@ const LoginPage = () => {
   const router = useRouter();
   const handleLogin = async () => {
     const response1 = await request.get(`/user/role`,{params:{email:account}})
-
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     if(response1.data.data==1){
       const response = await request.post(`/auth/login`,{account,password})
       if (response.data.success) {
