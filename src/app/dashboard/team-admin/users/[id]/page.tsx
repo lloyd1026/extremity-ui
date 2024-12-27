@@ -35,7 +35,7 @@ const UserDetail = () => {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<boolean>(false);
   const [image, setImage] = useState<File | null>(null); // 存储选择的图片
-  const [image2, setImage2] = useState<File | null>(null); // 存储选择的图片
+  // const [image2, setImage2] = useState<File | null>(null); // 存储选择的图片
 
 
 
@@ -58,12 +58,12 @@ const UserDetail = () => {
     }
   };
 
-  const handleFileChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImage2(file);
-    }
-  };
+  // const handleFileChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (file) {
+  //     setImage2(file);
+  //   }
+  // };
 
   const fetchUserInfo = async (userId: number) => {
     setLoading(true);
@@ -101,9 +101,6 @@ const UserDetail = () => {
       formData.append('teamMemberInfoDTO', JSON.stringify(tempUserInfo)); // 添加 JSON 数据
       if (image) {
         formData.append('file', image); // 将图片文件添加到FormData
-      }
-      if(image2){
-        formData.append('file2', image2);
       }
       
       formData.forEach((value, key) => {
@@ -189,16 +186,6 @@ const UserDetail = () => {
     }
   }
 
-  // const currentImage2 = () => {
-  //   if (image2) {
-  //     return URL.createObjectURL(image2);
-  //   }
-  //   if (tempUserInfo && tempUserInfo.bgImgUrl) {
-  //     return `${config.imageUrl}${tempUserInfo.bgImgUrl}`;
-  //   }
-  //   return "/images/default-bg.jpg"; // 默认背景图
-  // };
-
   return (
     <div className="container mx-auto p-6">
       {/* 内容区 */}
@@ -254,14 +241,14 @@ const UserDetail = () => {
             </div>
 
             {/* 背景图片显示与修改 */}
-            <div className="col-span-full mb-6">
+            {/* <div className="col-span-full mb-6">
               <div className="mt-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                   选择文件上传：
                 </label>
                 <input type="file" onChange={handleFileChange2} />
               </div>
-            </div>
+            </div> */}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField("真实姓名", "realName")}
