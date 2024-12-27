@@ -6,10 +6,6 @@ import Card from "./ariticleCard";
 import { Article as ArticleType } from "@/app/frontend/components/info";
 import moment from 'moment'; // 用于处理日期
 import config from "@/config/baseurl_config";
-<<<<<<< HEAD
-=======
-
->>>>>>> 8198bfb377f921549f74643a6050f7e259f3da92
 interface ArticleProps {
   categoryId: number;  // 只接收 categoryId 参数
 }
@@ -94,11 +90,7 @@ const Article: React.FC<ArticleProps> = ({ categoryId }) => {
           <Card
             key={article.idArticle}
             title={article.articleTitle}
-<<<<<<< HEAD
-            imageUrl={config.baseUrl+article.articleThumbnailUrl}
-=======
             imageUrl={config.baseUrl+ article.articleThumbnailUrl||"/images/bg/bg3.jpg"}
->>>>>>> 8198bfb377f921549f74643a6050f7e259f3da92
             tag={article.articleTags}
             date={moment(article.updatedTime).format("YYYY-MM-DD")}
             description={article.articlePreviewContent}
