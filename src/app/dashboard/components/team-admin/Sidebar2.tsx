@@ -2,6 +2,8 @@ import { FaUsers, FaClipboardList, FaCogs, FaArrowLeft, FaArrowRight, FaPaperPla
 import { Transition } from '@headlessui/react';
 import { usePathname } from 'next/navigation';  // 用于布局和客户端导航
 import Link from 'next/link'; // 导入 next/link 进行路由跳转
+import instance from '@/utils/request';
+import { useEffect, useState } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,14 +12,23 @@ interface SidebarProps {
 
 const Sidebar2 = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const pathname = usePathname(); // 获取当前路径
-
+  const [currentPermissions,setCurrentPermissions] = useState([])
   // 用于判断当前路径
   const getNavLinkClass = (path: string) => {
     return pathname === path
       ? 'bg-purple-300 text-white hover:bg-purple-300'  // 高亮当前页面按钮，使用淡紫色
       : 'hover:bg-purple-50 text-black';  // 默认按钮样式，使用淡紫色的hover效果
   };
-  
+  const fetchPermission = async ()=>{
+    const response = await instance.get("/auth/getPermissions");
+    if(response.data.success){
+      setCurrentPermissions(response.data.data)
+    }
+  } 
+
+  useEffect(()=>{
+    fetchPermission()
+  },[])
 
   return (
     <div className="relative">
@@ -52,26 +63,29 @@ const Sidebar2 = ({ isOpen, toggleSidebar }: SidebarProps) => {
                 </Link>
               </li>
               
+              {(currentPermissions&&currentPermissions.includes(2))&&(
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/achievementManagement')}`}>
                 <FaPaperPlane className="mr-4 text-xl text-black" /> {/* 使用 FaPaperPlane 替代 FaShieldAlt */}
                 <Link href="/dashboard/team-admin/achievementManagement" className="text-lg text-black hover:text-purple-900">
                   所有成果管理
                 </Link>
-              </li>
+              </li>)}
 
+              {(currentPermissions&&currentPermissions.includes(3))&&(
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/editor')}`}>
                 <FaClipboardList className="mr-4 text-xl text-black" />
                 <Link href="/dashboard/team-admin/editor" className="text-lg text-black hover:text-purple-900">
                   个人成果管理
                 </Link>
-              </li>
+              </li>)}
 
+              {(currentPermissions&&currentPermissions.includes(1))&&(
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/users')}`}>
                 <FaCogs className="mr-4 text-xl text-black" />
                 <Link href="/dashboard/team-admin/users" className="text-lg text-black hover:text-purple-900">
                   用户管理
                 </Link>
-              </li>
+              </li>)}
 
               <li className={`flex items-center mb-4 py-2 px-4 hover:bg-purple-50 rounded-lg transition-colors ${getNavLinkClass('/dashboard/team-admin/chat-online')}`}>
                 <FaCommentDots className="mr-4 text-xl text-black" /> {/* 使用 FaCommentDots 替代 FaCogs */}

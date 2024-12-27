@@ -99,9 +99,8 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
 
         {/* 用户头像和名称 */}
         <div
-          className="flex items-center space-x-2 relative"
-          onMouseEnter={() => setIsDropdownOpen(true)}
-          onMouseLeave={() => setIsDropdownOpen(false)}
+          className="flex items-center space-x-2 relative h-full"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           <Image
             src={avatar()}

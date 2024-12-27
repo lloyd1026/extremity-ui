@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import instance from '@/utils/request';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
+import config from "@/config/baseurl_config";
 
 interface Article {
   idArticle: number;
@@ -132,7 +133,19 @@ const ArticlesPage = () => {
             key={article.idArticle}
             className="rounded-lg shadow-lg"
             hoverable
-            cover={<Image alt={article.articleTitle} src={article.articleThumbnailUrl||"/images/bg/bg3.jpg"} layout="responsive" width={500} height={300} />}
+            cover={
+              <Image
+                alt={article.articleTitle}
+                src={
+                  article.articleThumbnailUrl 
+                    ? config.baseUrl + article.articleThumbnailUrl 
+                    : "/images/bg/bg3.jpg"
+                }
+                layout="responsive"
+                width={500}
+                height={300}
+              />
+            }
           >
             <Card.Meta
               title={<h2 className="text-xl font-bold">{article.articleTitle}</h2>}

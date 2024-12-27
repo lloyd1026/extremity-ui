@@ -6,6 +6,7 @@ const LoginPage = () => {
   const [account, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+
   const handleLogin = async () => {
     const response1 = await request.get(`/user/role`,{params:{email:account}})
     localStorage.removeItem('token');
@@ -29,6 +30,7 @@ const LoginPage = () => {
       handleLogin(); // 按下 Enter 键时触发登录事件
     }
   };
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
