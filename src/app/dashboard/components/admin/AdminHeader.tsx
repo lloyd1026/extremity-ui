@@ -36,6 +36,7 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
       return "/images/default-avatar.jpg"
     }
     if(auth.avatarUrl&&auth.avatarUrl.length!=0){
+      console.log("图像路径：" + config.imageUrl+auth.avatarUrl);
       return config.imageUrl+auth.avatarUrl;
     }
       return "/images/default-avatar.jpg"
