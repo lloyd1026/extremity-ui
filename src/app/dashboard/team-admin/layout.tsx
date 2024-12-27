@@ -3,6 +3,7 @@
 import { ReactNode, useState, useEffect} from 'react';
 import Sidebar from '@/app/dashboard/components/team-admin/Sidebar2';
 import UserHeader from '@/app/dashboard/components/team-admin/Header';
+import PrivateRoute from '../components/auth/privateroute';
 
 // import { AuthProvider } from '@/app/dashboard/components/auth/authcontext'; // 确保路径正确
 
@@ -19,7 +20,7 @@ const TeamAdminLayout = ({ children }: TeamAdminLayoutProps) => {
   };
 
   return (
-    // <AuthProvider>
+    <PrivateRoute roles={[2]}>
       <div className="flex flex-col h-screen">
         {/* Header */}
         <UserHeader isSidebarOpen={isSidebarOpen} />
@@ -36,7 +37,7 @@ const TeamAdminLayout = ({ children }: TeamAdminLayoutProps) => {
           {children}
         </div>
       </div>
-    // </AuthProvider>
+    </PrivateRoute>
   );
 };
 

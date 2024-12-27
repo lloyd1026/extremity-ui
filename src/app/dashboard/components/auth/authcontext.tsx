@@ -1,59 +1,83 @@
-"use clients"
+// src/contexts/AuthContext.tsx
+
+"use client"; // 正确的 Next.js 客户端指令
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import userwithRoles from '@/interfaces/userwithRoles';
 import getuserwithRoles from '@/utils/getuserwithRoles';
-import { usePathname} from 'next/navigation';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { UnAuthenticatedError } from '@/exceptions/CustomErrors';
+import Loading from '@/app/frontend/components/loading/loading';
 
-const AuthContext = createContext<{ auth: userwithRoles | null | undefined, setAuth: React.Dispatch<React.SetStateAction<userwithRoles | null| undefined>> }>({ auth: null, setAuth: () => {} });
-import { ReactNode } from 'react';
+// 定义 AuthContext 的类型
+interface AuthContextType {
+  auth: userwithRoles | null;
+  setAuth: React.Dispatch<React.SetStateAction<userwithRoles | null>>;
+}
 
-export const AuthProvider = ({ children }: {children:ReactNode}) => {
-  const [auth, setAuth] = useState<userwithRoles|null|undefined>(undefined);
-  const [isMounted,setIsMounted] = useState<boolean>(false);
-  const pathname = usePathname();
-  
-  const getme = async ()=>{
-    try{
-        const response = await getuserwithRoles();
-        console.log(response)
-        if(response.data && response.data.success &&response.data.data.user){
-            console.log("在context文件里"+response.data.data.user)
-            setAuth(response.data.data.user);
-        }else{
-            setAuth(null);
-        }
-    }
-    catch(error){
-        console.log(error);
+// 创建 AuthContext，默认值为 { auth: null, setAuth: () => {} }
+const AuthContext = createContext<AuthContextType>({ auth: null, setAuth: () => {} });
+
+// 定义 AuthProvider 的 Props 类型
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+// AuthProvider 组件
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [auth, setAuth] = useState<userwithRoles | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const router = useRouter();
+
+  // 获取用户信息的函数
+  const getMe = async () => {
+    try {
+      const response = await getuserwithRoles();
+      if (response.data && response.data.success && response.data.data.user) {
+        console.log("当前角色：", response.data.data.user);
+        setAuth(response.data.data.user);
+      } else {
+        console.log("当前没有角色");
         setAuth(null);
-        // if(error instanceof UnAuthenticatedError){
-        //     console.log("进入login");
-        //     router.push('/frontend/login');
-        // }else{
-        //     console.log("进入404");
-        //     router.push('/404');
-        // }
+      }
+    } catch (error: any) {
+      console.error("获取用户信息失败：", error);
+      setAuth(null);
+      if (error instanceof UnAuthenticatedError) {
+        console.log("进入登录页");
+        router.push('/dashboard/login');
+      } else {
+        console.log("进入404页");
+        router.push('/404');
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    if(localStorage.getItem('token')===null){
-        console.log("token === null")
-        setAuth(null)
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log("token === null");
+      setAuth(null);
+      setIsLoading(false);
+      return;
     }
-    getme();
-    setIsMounted(true)
-}, [pathname]);
+    getMe();
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
-    isMounted&&
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}
     </AuthContext.Provider>
   );
-
 };
 
-export const useAuth = () => {
+// 自定义的 useAuth Hook
+export const useAuth = (): AuthContextType => {
   return useContext(AuthContext);
 };

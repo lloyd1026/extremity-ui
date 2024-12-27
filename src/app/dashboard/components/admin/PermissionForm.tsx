@@ -14,6 +14,7 @@ interface UserRole {
   activated: number;
   avatarUrl: string;
   nickName: string;
+  permissions: number[]; // 权限数组
 }
 
 function formatTimestamp(timestamp: number): string {
@@ -32,28 +33,35 @@ const PermissionsManage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isActivatedFilter, setIsActivatedFilter] = useState<boolean>(false); // false: 未激活, true: 已激活
+  const [searchTerm, setSearchTerm] = useState<string>(""); // 搜索框输入
   const usersPerPage = 10;
 
   const fetchRoles = async () => {
     setLoading(true);
     try {
-      const endpoint = isActivatedFilter
-        ? "admin/user/get-activate-role" // 已激活 API
-        : "admin/user/get-deactivate-role"; // 未激活 API
-
-      const response = await request.get(endpoint, {
+      const response = await request.get("admin/user/get-activate-role", {
         params: { idRole: 2 },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
       });
 
       if (response.data.success) {
         const sortedData = response.data.data.sort(
           (a: UserRole, b: UserRole) => b.createdTime - a.createdTime
         );
-        setUserRoles(sortedData);
+
+        const rolesWithPermissions = await Promise.all(
+          sortedData.map(async (user: UserRole) => {
+            const permResponse = await request.get("admin/team-admin/get-permissions", {
+              params: { idUser: user.idUser },
+            });
+
+            return {
+              ...user,
+              permissions: permResponse.data.success ? permResponse.data.data || [] : [],
+            };
+          })
+        );
+
+        setUserRoles(rolesWithPermissions);
       } else {
         setError("无法加载数据");
       }
@@ -65,39 +73,47 @@ const PermissionsManage = () => {
     }
   };
 
-  const toggleActivationStatus = async (
-    userId: number,
-    roleId: number,
-    isActivated: number
-  ) => {
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const togglePermission = async (idUser: number, permission: number, hasPermission: boolean) => {
+    const action = hasPermission ? "移除" : "分配";
+    const confirmMessage = `您确定要${action}此用户的权限吗？`;
+
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
     try {
-      const endpoint =
-        isActivated === 0
-          ? "admin/user/activate-role"
-          : "admin/user/deactivate-role";
+      const response = await request.get(
+        hasPermission
+          ? "admin/team-admin/deallocate-permission"
+          : "admin/team-admin/allocate-permission",
+        { params: { idUser, permission } }
+      );
 
-      const result = await request.get(endpoint, {
-        params: { idUser: userId, idRole: roleId },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (result.data.success) {
-        alert(result.data.message || "操作成功");
-        fetchRoles();
+      if (response.data.success) {
+        setUserRoles((prevRoles) =>
+          prevRoles.map((user) =>
+            user.idUser === idUser
+              ? {
+                  ...user,
+                  permissions: hasPermission
+                    ? user.permissions.filter((perm) => perm !== permission)
+                    : [...user.permissions, permission],
+                }
+              : user
+          )
+        );
       } else {
-        alert(`操作失败: ${result.data.message || "未知错误"}`);
+        alert("操作失败，请稍后再试");
       }
     } catch (error) {
-      console.error("操作失败:", error);
+      console.error("请求失败:", error);
       alert("网络错误或服务器错误");
     }
   };
-
-  useEffect(() => {
-    fetchRoles();
-  }, [isActivatedFilter]); // 监听激活状态的切换
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -113,53 +129,38 @@ const PermissionsManage = () => {
     return <div>{error}</div>;
   }
 
-  const currentPageData = userRoles.slice(
+  const filteredUserRoles = userRoles.filter((user) => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return (
+      user.nickName.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.email.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.idUser.toString().includes(lowerCaseSearchTerm) ||
+      user.permissions.some((perm) => perm.toString().includes(lowerCaseSearchTerm))
+    );
+  });
+
+  const currentPageData = filteredUserRoles.slice(
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
   );
 
   return (
     <div>
-      {/* 左上角滑动按钮 */}
-      <div className="flex justify-start items-center mb-4">
-        <div className="relative">
-          {/* 滑动开关 */}
-          <label className="flex items-center cursor-pointer">
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={isActivatedFilter}
-                onChange={() => setIsActivatedFilter(!isActivatedFilter)}
-                className="sr-only" // 隐藏实际的 checkbox
-              />
-              {/* 开关背景 */}
-              <div
-                className={`block w-16 h-8 rounded-full transition-colors ${
-                  isActivatedFilter ? "bg-purple-300" : "bg-gray-300"
-                }`}
-              ></div>
-              {/* 滑块 */}
-              <div
-                className={`absolute top-0 left-0 w-8 h-8 bg-white rounded-full shadow-md transform transition-transform duration-1000 ${
-                  isActivatedFilter ? "translate-x-8" : "translate-x-0"
-                }`}
-              ></div>
-            </div>
-            {/* 标签 */}
-            <span className="ml-3 text-sm text-gray-700">
-              {isActivatedFilter ? "level 1" : "level 0"}
-            </span>
-          </label>
-        </div>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="搜索用户 (昵称/邮箱/ID/权限)"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md"
+        />
       </div>
-
       <div className="space-y-4">
         {currentPageData.map((user) => (
           <div
             key={user.idUser}
             className="flex items-center justify-between p-4 border border-gray-300 rounded-xl shadow-sm hover:shadow-lg hover:scale-105 hover:z-10 transition-all duration-300"
           >
-            {/* 头像 */}
             <Image
               src={user?.avatarUrl ? `${config.imageUrl}${user.avatarUrl}` : "/images/default-avatar.jpg"}
               alt="用户头像"
@@ -168,7 +169,6 @@ const PermissionsManage = () => {
               className="rounded-full"
             />
 
-            {/* 用户信息 */}
             <div className="flex-1 ml-4">
               <p className="text-sm text-gray-800">
                 <strong>昵称:</strong> {user.nickName}
@@ -181,35 +181,29 @@ const PermissionsManage = () => {
               </p>
             </div>
 
-            {/* 标签和按钮 */}
-            <div className="flex items-center space-x-2">
-              {/* 标签 */}
-              <span className="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
-                {user.roleName}
-              </span>
-              <span className="px-2 py-1 text-sm rounded-full bg-green-100 text-green-800">
-                {user.activated === 0 ? "level 0" : "level 1"}
-              </span>
-
-              {/* 激活状态按钮 */}
-              <button
-                onClick={() =>
-                  toggleActivationStatus(user.idUser, user.idRole, user.activated)
-                }
-                className={`px-3 py-1 text-sm rounded-md ${
-                  user.activated === 0
-                    ? "bg-red-500 text-white hover:bg-red-600"
-                    : "bg-green-500 text-white hover:bg-green-600"
-                }`}
-              >
-                {user.activated === 0 ? "授权" : "取消授权"}
-              </button>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {[
+                { id: 1, label: "用户管理" },
+                { id: 2, label: "成果管理" },
+                { id: 3, label: "成果发布" },
+              ].map((perm) => (
+                <button
+                  key={perm.id}
+                  className={`px-4 py-2 text-sm rounded-md ${
+                    user.permissions.includes(perm.id)
+                      ? "bg-yellow-400 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
+                  onClick={() => togglePermission(user.idUser, perm.id, user.permissions.includes(perm.id))}
+                >
+                  {perm.label}
+                </button>
+              ))}
             </div>
           </div>
         ))}
       </div>
 
-      {/* 分页 */}
       <div className="flex justify-center mt-6">
         <button
           onClick={() => handlePageChange(currentPage - 1)}

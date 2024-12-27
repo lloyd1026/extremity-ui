@@ -1,4 +1,4 @@
-import { FaUsers, FaShieldAlt, FaClipboardList, FaCogs, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { FaUsers, FaShieldAlt, FaClipboardList, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { Transition } from '@headlessui/react';
 import { usePathname } from 'next/navigation';  // 用于布局和客户端导航
 import Link from 'next/link'; // 导入 next/link 进行路由跳转
