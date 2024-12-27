@@ -21,9 +21,11 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
     }
 
     if (auth === null) {
-      console.log("跳转到登录页");
-      router.push('/dashboard/login');
-      return;
+      if(localStorage.getItem("token")==null){
+        console.log("跳转到登录页");
+        router.push('/dashboard/login');
+      }
+        return;
     }
 
     if (roles && roles.length > 0) {
@@ -35,6 +37,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
         router.push('/unauthorized');
       }
     }
+
   }, [auth, roles, router]);
 
   if (auth === undefined) {
