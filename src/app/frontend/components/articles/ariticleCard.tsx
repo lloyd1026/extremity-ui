@@ -12,33 +12,33 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ title, imageUrl, tag, date, description, link }) => {
   return (
-    <div className="flex justify-center p-4">
-      <div className="max-w-xs bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="relative">
-          <div className=" relative w-full h-36 bg-gray-200 p-3">
-            <img
-              src={imageUrl}
-              alt={title}
-              className="w-full h-full object-cover rounded-md"
-            />
-            <span className="absolute top-2 left-3 text-xs uppercase text-white bg-black bg-opacity-50 px-2 py-1 rounded-md">
-              {tag}
-            </span>
-          </div>
+    <div className="flex justify-center p-4 w-full">
+      {/* 使用 <a> 标签包裹整个卡片，点击整个卡片会跳转 */}
+      <a
+        href={link}
+        className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden flex transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+      >
+        {/* 图片部分，图片在左边 */}
+        <div className="relative w-1/3 h-full">
+          <img
+            src={imageUrl}
+            alt={title}
+            className="w-full h-full object-cover rounded-l-lg"
+          />
+          <span className="absolute top-2 left-3 text-xs uppercase text-white bg-black bg-opacity-50 px-2 py-1 rounded-md">
+            {tag}
+          </span>
           <div className="absolute bottom-3 right-3 text-xs text-gray-500">
             <span>{date}</span>
           </div>
         </div>
-        <div className="p-4">
-          <a href={link} className="block">
-            <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
-          </a>
-          <p className="text-sm text-gray-600 mt-2">{description}</p>
+
+        {/* 文字部分，文字在右边 */}
+        <div className="flex flex-col justify-between p-4 w-2/3 min-h-[200px]">
+          <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+          <p className="text-sm text-gray-600 mt-2 flex-grow">{description}</p>
         </div>
-        <div className="p-4 border-t text-center">
-          <a href={link} className="text-indigo-600 hover:text-indigo-800">Read more...</a>
-        </div>
-      </div>
+      </a>
     </div>
   );
 };

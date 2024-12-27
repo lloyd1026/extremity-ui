@@ -143,14 +143,15 @@ const Header = () => {
                     设置
                   </Link>
                 </MenuItem>
-                <MenuItem>
+                {auth?.scope[0]==4&&(   <MenuItem>
                   <Link
                     href="/frontend/my-comment"
                     className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
                   >
                     我的反馈
                   </Link>
-                </MenuItem>
+                </MenuItem>)}
+
                 <Menu.Item>
 
                 {({ active }) => (

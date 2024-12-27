@@ -10,9 +10,8 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import AttachmentManager from '../../../../components/articlecontentEditor/attachmentManager';
 
-const ArticleContentPage = () => {
+const PreviewPage = () => {
   const params = useParams(); // Access params as a Promise
   const articleId = params.id; // Access id directly from params
   const router = useRouter();
@@ -22,6 +21,7 @@ const ArticleContentPage = () => {
       router.push("/404");
     }
   }, [articleId, router]);
+
   const [ post, setPost] = useState(null);
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const [tocItemActive, setTocItemActive] = useState<string | null>(null);
@@ -265,7 +265,6 @@ const ArticleContentPage = () => {
               }}
             />
           </article>
-            <AttachmentManager draftId={articleId} canModify={false} />
         </div>
         <aside className='sticky top-12 order-last hidden xl:block'>
           <TableOfContent
@@ -279,4 +278,5 @@ const ArticleContentPage = () => {
     </>
   );
 };
-export default ArticleContentPage;
+
+export default PreviewPage;
