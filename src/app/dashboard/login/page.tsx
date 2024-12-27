@@ -17,6 +17,8 @@ export default function Login() {
     setLoading(true);
 
     try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       const response = await request.post('auth/login', {
           "account": email,
           "password": password 

@@ -6,15 +6,14 @@ import instance from "@/utils/request";
 import { toast } from "react-toastify";
 import Modal from "antd/es/modal/Modal";
 import "react-toastify/dist/ReactToastify.css";
-import Loading from "../../app/frontend/components/loading/loading";
-import { Form, Input, Select, Upload, Button } from "antd";
+import { Form, Input, Select, Upload, Button, DatePicker } from "antd";
 import type { UploadProps } from "antd/es/upload";
 import { UploadOutlined } from "@ant-design/icons";
 import config from "@/config/baseurl_config";
 import { usePathname, useRouter } from "next/navigation";
 import AttachmentManager from "./attachmentManager";
+import moment from "moment";
 
-// 文章类型枚举
 const articleTypeOptions = [
   { label: "科研文章", value: 0 },
   { label: "专著", value: 1 },
@@ -77,7 +76,7 @@ interface ArticleInfo {
   articleTags: string;
   articleThumbnailUrl: string;
   articleStatus: string;
-  // 其他字段...
+  finalShowTime: string;
 }
 
 export default function Content({ id }: { id: string }) {
@@ -142,6 +141,7 @@ export default function Content({ id }: { id: string }) {
             tags: response.data.data.articleTags
               ? response.data.data.articleTags.split(",")
               : [],
+            finaltime: moment(response.data.data.finalShowTime,'YYYY-MM-DD HH:mm:ss')
           });
         });
       }
@@ -161,9 +161,6 @@ export default function Content({ id }: { id: string }) {
     }
   };
 
-  /**
-   * 综合获取文章信息和内容
-   */
   const fetchData = async () => {
     console.log("Fetching data...");
     setLoading(true);
@@ -258,11 +255,13 @@ export default function Content({ id }: { id: string }) {
    * 点击“编辑文章详细信息”按钮
    */
   const handleEdit = async () => {
-    const res = await fetchArticleInfo();
-    if (res === true) {
-      setIsOpen(true);
-    }
+    setIsOpen(true);
   };
+  useEffect(()=>{
+    if(isOpen){
+       fetchArticleInfo();
+    }
+  },[isOpen])
 
   /**
    * Modal 中“确定”按钮
@@ -279,7 +278,9 @@ export default function Content({ id }: { id: string }) {
       formData.append("idArticle", id);
       formData.append("summary", values.summary);
       formData.append("articleType", String(values.articleType || 0));
+      formData.append("finaltime", values.finaltime.format("YYYY-MM-DD HH:mm:ss"))
       // tags 用逗号拼接
+
       if (values.tags?.length) {
         formData.append("tags", values.tags.join(","));
       }
@@ -287,8 +288,10 @@ export default function Content({ id }: { id: string }) {
       if (coverFile) {
         formData.append("coverFile", coverFile);
       }
+
       setConfirmLoading(true);
       const response = await instance.post("/article/DraftCompendium", formData);
+
       if (response.data.success) {
         toast.success("文章信息更新成功！");
         setIsOpen(false);
@@ -391,6 +394,17 @@ export default function Content({ id }: { id: string }) {
                   placeholder="请输入标签后回车"
                 />
               </Form.Item>
+
+              <Form.Item 
+                label="文章最终发布时间" 
+                name="finaltime" 
+                rules={[{ required: true, message: '请选择最终发布时间!' }]}
+            >
+                <DatePicker 
+                    showTime 
+                    format="YYYY-MM-DD HH:mm:ss" 
+                />
+            </Form.Item>
 
               <Form.Item label="文章封面">
                 {/* 如果当前已选择了新文件，就显示新文件的预览 */}

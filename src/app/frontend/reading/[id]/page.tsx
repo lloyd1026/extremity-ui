@@ -1,5 +1,6 @@
 'use client';
 
+import AttachmentShower from '@/components/articlecontentEditor/attachmentManagerView';
 import { Editor, EditorRef } from '@/components/editor';
 import TableOfContent from '@/components/editor/components/table-of-content';
 import { TocItem } from '@/components/editor/lib/table-of-contents';
@@ -10,22 +11,22 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import AttachmentManager from '../../../../components/articlecontentEditor/attachmentManager';
 
-const ArticleContentPage = () => {
+const PreviewPage = () => {
   const params = useParams(); // Access params as a Promise
   const articleId = params.id; // Access id directly from params
   const router = useRouter();
-
   useEffect(() => {
     if (isNaN(Number(articleId))) {
       router.push("/404");
     }
   }, [articleId, router]);
+
   const [ post, setPost] = useState(null);
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const [tocItemActive, setTocItemActive] = useState<string | null>(null);
   const [showProgress, setShowProgress] = useState(false);
+
   const [progress, setProgress] = useState(0);
   const editorRef = useRef<EditorRef>(null);
   const contentRef = useRef<HTMLElement>(null);
@@ -34,7 +35,6 @@ const ArticleContentPage = () => {
     e.preventDefault();
     const editor = editorRef.current.getEditor();
     const element = editor.view.dom.querySelector(`[id="${id}"]`);
-
     const elementTop = element.getBoundingClientRect().top + window.scrollY;
     const offset = window.innerHeight * 0.05;
 
@@ -69,7 +69,7 @@ const ArticleContentPage = () => {
 
     const fetchPost = async ()=>{
       try{
-        const response = await instance.get(`/article/DraftWithAllInfo/${articleId}`);
+        const response = await instance.get(`/articleView/DraftWithAllInfo/${articleId}`);
         if(response.data.success){
           setPost(response.data.data);
         }else{
@@ -80,7 +80,6 @@ const ArticleContentPage = () => {
           toast.error("请求失败");
       }
     }
-
     fetchPost()
   },[])
 
@@ -236,7 +235,7 @@ const ArticleContentPage = () => {
           <div className='flex items-center'>
             <div className='flex items-center gap-2 text-sm'>
               <CalendarDays size={18} />
-              <span>{post.updatedTime}</span>
+              <span>{post.finalShowTime}</span>
             </div>
             <div className='h-1.5 w-1.5 mx-3 rounded-full bg-gray-500 dark:bg-gray-300'></div>
             <div className='flex items-center gap-2 text-sm'>
@@ -265,7 +264,9 @@ const ArticleContentPage = () => {
               }}
             />
           </article>
-            <AttachmentManager draftId={articleId} canModify={false} />
+        <div className="w-full">
+        <AttachmentShower draftId={articleId} />
+          </div>
         </div>
         <aside className='sticky top-12 order-last hidden xl:block'>
           <TableOfContent
@@ -279,4 +280,5 @@ const ArticleContentPage = () => {
     </>
   );
 };
-export default ArticleContentPage;
+
+export default PreviewPage;
