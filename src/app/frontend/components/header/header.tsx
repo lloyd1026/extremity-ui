@@ -50,6 +50,24 @@ const Header = () => {
     router.push('/frontend/login'); // 登出后跳转到主页面
    }
 
+   const handleDelete = async () => {
+    const isConfirmed = window.confirm('您确定要注销账号吗？');
+    if (isConfirmed) {
+        const response = await request.get(`/auth/submit-delete`, {params:{idUser: auth?.idUser}});
+        
+        if(response.data.success){
+          alert("您的注销申请已提交至管理员审核");
+        }
+        // sessionStorage.removeItem('userInfo'); // 删除登录状态
+        // localStorage.removeItem('token');
+        // localStorage.removeItem('refreshToken');
+
+        // router.push('/frontend/login'); // 登出后跳转到主页面
+    } else {
+        console.log('用户取消了退出操作');
+    }
+   }
+
    const avatar = ()=>{
     if(!isMounted){
       return "/images/default-avatar.jpg"
@@ -151,8 +169,8 @@ const Header = () => {
                     我的反馈
                   </Link>
                 </MenuItem>
-                <Menu.Item>
 
+                <MenuItem>
                 {({ active }) => (
                   <Link
                     href="#" // 可以保留 href，避免控制台警告
@@ -169,7 +187,26 @@ const Header = () => {
                     {auth? '退出' : '登录'}
                   </Link>
                 )}
-              </Menu.Item>
+              </MenuItem>
+
+              {auth && (
+              <MenuItem>
+                {({ active }) => (
+                  <Link
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault(); // 阻止默认跳转行为
+                      handleDelete(); // 仅在登录状态下执行退出逻辑
+                    }}
+                    className={`block w-full px-4 py-2 text-sm text-gray-700 ${
+                      active ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    注销
+                  </Link>
+                )}
+              </MenuItem>
+)}
               </MenuItems>
             </Menu>
           </div>
