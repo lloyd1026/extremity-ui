@@ -16,7 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     isMounted?
-    (<PrivateRoute roles={[1,2,3]}>
+    (<PrivateRoute roles={[2]}>
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
     <SharedStateProvider>

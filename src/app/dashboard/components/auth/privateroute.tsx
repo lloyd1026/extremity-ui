@@ -1,7 +1,5 @@
-"use client";
-
-import React, { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ReactNode, useEffect } from 'react';
 import { useAuth } from './authcontext';
 import Loading from '@/app/frontend/components/loading/loading';
 
@@ -15,34 +13,17 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (auth === undefined) {
-      // 正在加载，不进行任何操作
-      return;
+    if(localStorage.getItem("refreshToken")===null){
+          router.push('/dashboard/login');
     }
-
-    if (auth === null) {
-      if(localStorage.getItem("refreshtoken")==null){
-        console.log("跳转到登录页");
-        router.push('/dashboard/login');
-      }
-        return;
-    }
-
-    if (roles && roles.length > 0) {
-      const userRoles = auth.scope; // 假设 auth.scope 是一个数字数组
-      const hasRequiredRole = roles.some(role => userRoles.includes(role));
-
-      if (!hasRequiredRole) {
-        console.log("无权限，跳转到未授权页");
-        router.push('/unauthorized');
+    if(auth!=null&&auth!=undefined){
+      if (roles && !roles.some(role => auth.scope.includes(role))) {
+          console.log("未授权")
+          router.push('/unauthorized');
       }
     }
-
-  }, [auth, roles, router]);
-
-  if (auth === undefined) {
-    return <Loading />;
-  }
-  return <>{children}</>;
+  }, [auth]);
+  return auth===undefined?<Loading/>:<>{children}</>; // 如果认证通过并且角色匹配，则渲染子组件
 };
+
 export default PrivateRoute;
