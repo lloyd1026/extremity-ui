@@ -1,5 +1,5 @@
 'use client';
-import AttachmentShower from '@/components/articlecontentEditor/AttachmentShower';
+import AttachmentShower from '@/components/articlecontentEditor/attachmentManagerView';
 import { Editor, EditorRef } from '@/components/editor';
 import TableOfContent from '@/components/editor/components/table-of-content';
 import { TocItem } from '@/components/editor/lib/table-of-contents';
@@ -72,7 +72,7 @@ const PreviewPage = () => {
         if(response.data.success){
           setPost(response.data.data);
         }else{
-          router.push('/404')
+          // router.push('/404')
         }
       }
       catch(error){

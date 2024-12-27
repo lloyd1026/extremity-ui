@@ -5,6 +5,7 @@ import { Pagination, DatePicker, Button } from 'antd'; // 引入 Pagination 和 
 import Card from "./ariticleCard";
 import { Article as ArticleType } from "@/app/frontend/components/info";
 import moment from 'moment'; // 用于处理日期
+import config from "@/config/baseurl_config";
 
 interface ArticleProps {
   categoryId: number;  // 只接收 categoryId 参数
@@ -67,8 +68,8 @@ const Article: React.FC<ArticleProps> = ({ categoryId }) => {
   }, [currentPage, categoryId, startDate, endDate]);  // 依赖项中加入 categoryId、startDate 和 endDate
 
   return (
-    <div className="flex justify-center items-center flex-col min-h-screen">
-      <div className="flex flex-wrap gap-6 justify-center mb-8">
+    <div className="flex flex-col items-center py-8 bg-gray-50 min-h-screen">
+      <div className="flex flex-wrap items-center gap-4 mb-10 w-4/5 mx-auto justify-start">
         {/* 起始日期选择器 */}
         <DatePicker
           value={startDate}
@@ -85,14 +86,14 @@ const Article: React.FC<ArticleProps> = ({ categoryId }) => {
         />
       </div>
 
-      <div className="flex flex-wrap gap-6 justify-center">
+      <div className="flex flex-row flex-wrap gap-6 w-4/5 mx-auto">
         {articles.map((article) => (
           <Card
             key={article.idArticle}
             title={article.articleTitle}
-            imageUrl={article.articleThumbnailUrl}
+            imageUrl={config.baseUrl+ article.articleThumbnailUrl||"/images/bg/bg3.jpg"}
             tag={article.articleTags}
-            date={article.updatedTime}
+            date={moment(article.updatedTime).format("YYYY-MM-DD")}
             description={article.articlePreviewContent}
             link={article.articleLink}
           />
@@ -100,7 +101,7 @@ const Article: React.FC<ArticleProps> = ({ categoryId }) => {
       </div>
 
       {/* 分页组件 */}
-      <div className="mt-8">
+      <div className="mt-8 w-4/5 mx-auto flex justify-center">
         <Pagination
           current={currentPage} // 当前页数
           total={total} // 总文章数
