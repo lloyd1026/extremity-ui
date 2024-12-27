@@ -21,7 +21,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {
     }
 
     if (auth === null) {
-      if(localStorage.getItem("token")==null){
+      if(localStorage.getItem("refreshtoken")==null){
         console.log("跳转到登录页");
         router.push('/dashboard/login');
       }
