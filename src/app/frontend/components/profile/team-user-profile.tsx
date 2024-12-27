@@ -8,7 +8,7 @@ import { useAuth } from '../auth/authcontext';
 import Loading from '../loading/loading';
 import config from '@/config/baseurl_config';
 interface TeamUserDetails {
-    idRole: number;
+  userId: number;
     position: string|null;
     personalBio: string|null;
     researchDirection: string|null;
@@ -87,7 +87,7 @@ const TeamUserProfile = () => {
     formData.append('sex', gender); // 添加性别到FormData
     formData.append('phone', phone); // 添加电话号码到FormData
     const teamUser1:TeamUserDetails = {
-            idRole:auth?.idUser,
+      userId:auth?.idUser,
             position:position,
             researchDirection:researchDirection,
             researchOverview:researchOverview,

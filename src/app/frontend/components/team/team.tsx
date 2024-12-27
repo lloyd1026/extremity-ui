@@ -8,7 +8,7 @@ import config from "@/config/baseurl_config"
 const { Title, Text } = Typography
 
 interface TeamUserDetails {
-  idRole: number;
+  userId: number;
   position: string;
   personalBio: string;
   researchDirection: string;
@@ -16,7 +16,7 @@ interface TeamUserDetails {
 }
 interface TeamUser {
   name:string;
-  idRole: number;
+  userId: number;
   position: string;
   personalBio: string;
   researchDirection: string;
@@ -61,7 +61,7 @@ export default function Example() {
   const handleCardClick = (user1: TeamUserDetails,user2:User) => {
     const user:TeamUser ={
         name:user2.realName,
-        idRole: user1.idRole,
+        userId: user1.userId,
         position: user1.position,
         personalBio: user1.personalBio,
         researchDirection: user1.researchDirection,
@@ -87,10 +87,10 @@ export default function Example() {
         <Col xs={24} lg={16}>
           <Row gutter={[32, 32]}>
             {teamUsers.map((person) => {
-              const teamUser = users.find(user => user.idUser === person.idRole)
+              const teamUser = users.find(user => user.idUser === person.userId)
 
               return (
-                <Col key={person.idRole} xs={24} sm={12}>
+                <Col key={person.userId} xs={24} sm={12}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }} onClick={() => teamUser && handleCardClick(person,teamUser)}>
                     <Avatar
                       size={64}

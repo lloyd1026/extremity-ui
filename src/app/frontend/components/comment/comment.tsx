@@ -129,7 +129,6 @@ const CommentSection: React.FC = () => {
                     ...comment,
                     id: Date.now(), // 使用时间戳模拟唯一 ID
                 };
-
                 setReplys((prev) => ({
                     ...prev,
                     [rootCommentId === 0 ? parentId : rootCommentId]: prev[rootCommentId === 0 ? parentId : rootCommentId] 
@@ -163,22 +162,21 @@ const CommentSection: React.FC = () => {
                 createdAt: formatDate(new Date()),
                 updatedAt: formatDate(new Date()),
             };
-
+    
             const response = await request.post(`/comment/add`, comment);
-
+    
             if (response.data.success) {
                 const newComment: commentDetails = {
                     ...comment,
                     id: Date.now(), // 使用时间戳模拟唯一 ID
                 };
-
-                setTopComments((prev) => [newComment, ...prev]);
-                setTotalPages(Math.ceil((topComments.length + 1) / PAGE_SIZE));
-                // 如果当前页是第一页，则添加新评论到当前页
-                if (currentPage === 1) {
-                    // 确保只显示 PAGE_SIZE 条评论
-                    setTopComments((prev) => [newComment, ...prev].slice(0, PAGE_SIZE));
-                }
+    
+                setTopComments((prev) => {
+                    const updatedComments = [newComment, ...prev];
+                    setTotalPages(Math.ceil(updatedComments.length / PAGE_SIZE)); // 使用更新后的评论列表计算总页数
+                    return updatedComments.slice(0, PAGE_SIZE); // 确保页面只显示 PAGE_SIZE 条评论
+                });
+    
                 storeCommentsInMap([newComment]);
                 await fetchUserDetails(newComment.userId);
             } else {
@@ -189,6 +187,7 @@ const CommentSection: React.FC = () => {
             alert("Failed to submit comment. Please try again.");
         }
     };
+    
 
     const getCurrentPageComments = () => {
         const start = (currentPage - 1) * PAGE_SIZE;
