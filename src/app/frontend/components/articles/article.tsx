@@ -95,7 +95,7 @@ const Article: React.FC<ArticleProps> = ({ categoryId }) => {
             tag={article.articleTags}
             date={moment(article.updatedTime).format("YYYY-MM-DD")}
             description={article.articlePreviewContent}
-            link={article.articleLink}
+            link={"/frontend/reading/"+article.idArticle}
           />
         ))}
       </div>
