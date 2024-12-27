@@ -99,9 +99,8 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
 
         {/* 用户头像和名称 */}
         <div
-          className="flex items-center space-x-2 relative"
-          onMouseEnter={() => setIsDropdownOpen(true)}
-          onMouseLeave={() => setIsDropdownOpen(false)}
+          className="flex items-center space-x-2 relative h-full"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           <Image
             src={avatar()}
@@ -115,7 +114,7 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
           {/* 下拉菜单 */}
           {isDropdownOpen && (
             <div
-              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-20"
+              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-50"
             >
               <Link
                 href="/dashboard/login"

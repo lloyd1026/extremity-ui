@@ -1,5 +1,5 @@
 'use client';
-import AttachmentShower from '@/components/articlecontentEditor/AttachmentShower';
+
 import { Editor, EditorRef } from '@/components/editor';
 import TableOfContent from '@/components/editor/components/table-of-content';
 import { TocItem } from '@/components/editor/lib/table-of-contents';
@@ -15,6 +15,7 @@ const PreviewPage = () => {
   const params = useParams(); // Access params as a Promise
   const articleId = params.id; // Access id directly from params
   const router = useRouter();
+
   useEffect(() => {
     if (isNaN(Number(articleId))) {
       router.push("/404");
@@ -235,7 +236,7 @@ const PreviewPage = () => {
           <div className='flex items-center'>
             <div className='flex items-center gap-2 text-sm'>
               <CalendarDays size={18} />
-              <span>{post.finalShowTime}</span>
+              <span>{post.updatedTime}</span>
             </div>
             <div className='h-1.5 w-1.5 mx-3 rounded-full bg-gray-500 dark:bg-gray-300'></div>
             <div className='flex items-center gap-2 text-sm'>
@@ -264,11 +265,6 @@ const PreviewPage = () => {
               }}
             />
           </article>
-
-          <div className="w-full">
-          <AttachmentShower draftId={articleId} />
-          </div>
-
         </div>
         <aside className='sticky top-12 order-last hidden xl:block'>
           <TableOfContent
@@ -278,7 +274,6 @@ const PreviewPage = () => {
           />
         </aside>
       </div>
-
     </div>
     </>
   );

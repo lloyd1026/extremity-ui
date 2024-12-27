@@ -17,6 +17,9 @@ const GetForgetEmail = () => {
         setIsEmailSent(true)
         alert('邮件发送成功');
     }
+    else{
+      alert('邮件发送失败')
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

@@ -21,15 +21,9 @@ const RoleDropdown = ({ selectedRoleId, onRoleChange }: RoleDropdownProps) => {
     const fetchRoles = async () => {
       setLoading(true);
       try {
-        const response = await request.get("admin/simple-roles", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
+        const response = await request.get("admin/simple-roles");
         if (response.data.success) {
           setRoles(response.data.data);
-          console.log("更新后的 roles:", response.data.data); // 验证 roles
         } else {
           setError("无法加载角色数据");
         }

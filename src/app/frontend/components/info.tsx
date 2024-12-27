@@ -54,7 +54,14 @@ export interface Article {
     articlePermalink: string;
     articleLink: string;
     createdTime: Date;
-    updatedTime: Date;
+    updatedTime: string;
     articleStatus: string;
     articleThumbsUpCount: number;
   }
+ export const articleTypeOptions = [
+    { label: "科研文章", value: 0 },
+    { label: "专著", value: 1 },
+    { label: "专利", value: 2 },
+    { label: "产品", value: 3 },
+    { label: "软著", value: 4 },
+  ];

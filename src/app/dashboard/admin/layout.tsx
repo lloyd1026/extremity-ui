@@ -3,6 +3,7 @@
 import { ReactNode, useState, useEffect} from 'react';
 import Sidebar from '@/app/dashboard/components/admin/Sidebar';
 import UserHeader from '@/app/dashboard/components/admin/AdminHeader';
+import PrivateRoute from '../components/auth/privateroute';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -17,6 +18,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   };
   // 通过后会正常渲染
   return (
+    <PrivateRoute roles={[1]}>
     <div className="flex flex-col h-screen">
       {/* Header */}
       <UserHeader isSidebarOpen={isSidebarOpen} />
@@ -33,6 +35,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         {children}
       </div>
     </div>
+    </PrivateRoute>
   );
 };
 
