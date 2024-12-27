@@ -264,12 +264,9 @@ const PreviewPage = () => {
               }}
             />
           </article>
-<<<<<<<< HEAD:src/app/frontend/components/preview/[id]/page.tsx
-========
         <div className="w-full">
         <AttachmentShower draftId={articleId} />
           </div>
->>>>>>>> e7991d31ef1a920827a33dd9b355d60f4470db8f:src/app/frontend/reading/[id]/page.tsx
         </div>
         <aside className='sticky top-12 order-last hidden xl:block'>
           <TableOfContent

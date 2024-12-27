@@ -115,7 +115,7 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
           {/* 下拉菜单 */}
           {isDropdownOpen && (
             <div
-              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-20"
+              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-50"
             >
               <Link
                 href="/dashboard/login"

@@ -13,7 +13,7 @@ const ToolbarWrapper = forwardRef<HTMLDivElement, ToolbarWrapperProps>(
         ref={ref}
         {...rest}
         className={cn(
-          'flex flex-shrink-0 select-none items-center gap-1 px-2 py-1 sticky top-0 left-0 z-50 w-full justify-between overflow-x-auto rounded-t-lg border-b border-b-border backdrop-blur drop-shadow-sm',
+          'flex flex-shrink-0 select-none items-center gap-1 px-2 py-1 sticky top-0 left-0 z-20 w-full justify-between overflow-x-auto rounded-t-lg border-b border-b-border backdrop-blur drop-shadow-sm',
           className
         )}
       >

@@ -5,7 +5,7 @@ import { Pagination, DatePicker, Button } from 'antd'; // 引入 Pagination 和 
 import Card from "./ariticleCard";
 import { Article as ArticleType } from "@/app/frontend/components/info";
 import moment from 'moment'; // 用于处理日期
-
+import config from "@/config/baseurl_config";
 interface ArticleProps {
   categoryId: number;  // 只接收 categoryId 参数
 }
@@ -90,11 +90,11 @@ const Article: React.FC<ArticleProps> = ({ categoryId }) => {
           <Card
             key={article.idArticle}
             title={article.articleTitle}
-            imageUrl={article.articleThumbnailUrl}
+            imageUrl={config.baseUrl+article.articleThumbnailUrl}
             tag={article.articleTags}
             date={article.updatedTime}
             description={article.articlePreviewContent}
-            link={article.articleLink}
+            link={"/frontend/reading/"+article.idArticle}
           />
         ))}
       </div>
