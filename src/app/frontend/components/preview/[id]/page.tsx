@@ -1,6 +1,5 @@
 'use client';
 
-import AttachmentShower from '@/components/articlecontentEditor/attachmentManagerView';
 import { Editor, EditorRef } from '@/components/editor';
 import TableOfContent from '@/components/editor/components/table-of-content';
 import { TocItem } from '@/components/editor/lib/table-of-contents';
@@ -16,6 +15,7 @@ const PreviewPage = () => {
   const params = useParams(); // Access params as a Promise
   const articleId = params.id; // Access id directly from params
   const router = useRouter();
+
   useEffect(() => {
     if (isNaN(Number(articleId))) {
       router.push("/404");
@@ -26,7 +26,6 @@ const PreviewPage = () => {
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const [tocItemActive, setTocItemActive] = useState<string | null>(null);
   const [showProgress, setShowProgress] = useState(false);
-
   const [progress, setProgress] = useState(0);
   const editorRef = useRef<EditorRef>(null);
   const contentRef = useRef<HTMLElement>(null);
@@ -35,6 +34,7 @@ const PreviewPage = () => {
     e.preventDefault();
     const editor = editorRef.current.getEditor();
     const element = editor.view.dom.querySelector(`[id="${id}"]`);
+
     const elementTop = element.getBoundingClientRect().top + window.scrollY;
     const offset = window.innerHeight * 0.05;
 
@@ -69,7 +69,7 @@ const PreviewPage = () => {
 
     const fetchPost = async ()=>{
       try{
-        const response = await instance.get(`/articleView/DraftWithAllInfo/${articleId}`);
+        const response = await instance.get(`/article/DraftWithAllInfo/${articleId}`);
         if(response.data.success){
           setPost(response.data.data);
         }else{
@@ -80,6 +80,7 @@ const PreviewPage = () => {
           toast.error("请求失败");
       }
     }
+
     fetchPost()
   },[])
 
@@ -235,7 +236,7 @@ const PreviewPage = () => {
           <div className='flex items-center'>
             <div className='flex items-center gap-2 text-sm'>
               <CalendarDays size={18} />
-              <span>{post.finalShowTime}</span>
+              <span>{post.updatedTime}</span>
             </div>
             <div className='h-1.5 w-1.5 mx-3 rounded-full bg-gray-500 dark:bg-gray-300'></div>
             <div className='flex items-center gap-2 text-sm'>
@@ -264,12 +265,6 @@ const PreviewPage = () => {
               }}
             />
           </article>
-<<<<<<<< HEAD:src/app/frontend/components/preview/[id]/page.tsx
-========
-        <div className="w-full">
-        <AttachmentShower draftId={articleId} />
-          </div>
->>>>>>>> e7991d31ef1a920827a33dd9b355d60f4470db8f:src/app/frontend/reading/[id]/page.tsx
         </div>
         <aside className='sticky top-12 order-last hidden xl:block'>
           <TableOfContent
