@@ -38,7 +38,6 @@ const UserDetail = () => {
   // const [image2, setImage2] = useState<File | null>(null); // 存储选择的图片
 
 
-
   useEffect(() => {
     if (id) {
       fetchUserInfo(Number(id));
@@ -187,7 +186,7 @@ const UserDetail = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto">
       {/* 内容区 */}
       <div className="relative z-10 bg-white bg-opacity-80 rounded-lg shadow-lg p-6 max-w-4xl mx-auto mt-20">
         {loading && <p>加载中...</p>}
@@ -252,6 +251,7 @@ const UserDetail = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderField("真实姓名", "realName")}
+              {renderField("昵称", "nickname")}
               {renderField("账号", "account")}
               {renderField("邮箱", "email")}
               {renderField("手机号", "phone")}

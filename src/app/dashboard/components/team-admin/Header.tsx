@@ -1,5 +1,6 @@
 "use client";
-import { FaRegEnvelope, FaCog } from "react-icons/fa"; // 导入你需要的图标
+// import { FaRegEnvelope, FaCog } from "react-icons/fa"; // 导入你需要的图标
+import { FaCog } from "react-icons/fa"; // 导入你需要的图标
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react"; // 用于控制下拉菜单显示
@@ -8,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/dashboard/components/auth/authcontext";
 import { userwithRoles } from "@/interfaces/userwithRoles";
 import config from "@/config/baseurl_config";
-import request from "@/utils/request";
+// import request from "@/utils/request";
 
 interface AdminHeaderProps {
   isSidebarOpen: boolean; // 传递侧边栏展开状态
@@ -19,39 +20,39 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
   const { auth } = useAuth() as { auth: userwithRoles | null };
   const [isMounted, setIsMounted] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 控制下拉菜单显示/隐藏
-  const [hasUnread, setHasUnread] = useState(false); // 消息状态
+  // const [hasUnread, setHasUnread] = useState(false); // 消息状态
 
   // 检查是否有未读消息
-  const fetchUnread = async () => {
-    try {
-      const endpoints = [
-        "team-admin/get-deactivated-team-members",
-        "team-admin/get-deactivated-normal-users",
-      ];
+  // const fetchUnread = async () => {
+  //   try {
+  //     const endpoints = [
+  //       "team-admin/get-deactivated-team-members",
+  //       "team-admin/get-deactivated-normal-users",
+  //     ];
 
-      const responses = await Promise.all(
-        endpoints.map((endpoint) =>
-          request.get(endpoint, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          })
-        )
-      );
+  //     const responses = await Promise.all(
+  //       endpoints.map((endpoint) =>
+  //         request.get(endpoint, {
+  //           headers: {
+  //             Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //           },
+  //         })
+  //       )
+  //     );
 
-      // 检查是否有未处理的信息
-      const hasPendingInfo = responses.some(
-        (response) => response.data.success && response.data.data?.length > 0
-      );
-      setHasUnread(hasPendingInfo);
-    } catch (error) {
-      console.error("Error fetching unread messages:", error);
-    }
-  };
+  //     // 检查是否有未处理的信息
+  //     const hasPendingInfo = responses.some(
+  //       (response) => response.data.success && response.data.data?.length > 0
+  //     );
+  //     setHasUnread(hasPendingInfo);
+  //   } catch (error) {
+  //     console.error("Error fetching unread messages:", error);
+  //   }
+  // };
 
   useEffect(() => {
     setIsMounted(true);
-    fetchUnread(); // 初始化时检查未读消息
+    // fetchUnread(); // 初始化时检查未读消息
   }, []);
 
   const handleNavigate = () => {
@@ -74,11 +75,11 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
       {/* 用户头像和按钮都放在右侧 */}
       <div className="flex items-center space-x-6">
         {/* 消息 */}
-        <Link
+        {/* <Link
           href="/dashboard/team-admin/users"
           className="relative flex items-center space-x-2 p-2 rounded-lg hover:bg-indigo-200 hover:text-indigo-600 transition-colors"
         >
-          <FaRegEnvelope size={20} /> {/* 消息图标 */}
+          <FaRegEnvelope size={20} /> 
           {hasUnread && (
             <span
               className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full"
@@ -86,7 +87,7 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
             />
           )}
           <span>消息</span>
-        </Link>
+        </Link> */}
 
         {/* 设置 */}
         <Link
