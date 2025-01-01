@@ -9,9 +9,9 @@ interface AddUserProps {
 }
 
 const AddTeamMember = ({ isOpen, onClose }: AddUserProps) => {
+  const [loading, setLoading] = useState(false); // 控制loading状态
   const [formData, setFormData] = useState({
     account: "",
-    password: "",
     email: "",
   });
 
@@ -24,6 +24,7 @@ const AddTeamMember = ({ isOpen, onClose }: AddUserProps) => {
     e.preventDefault();
 
     try {
+      setLoading(true); // 设置loading为true，开始加载
       const result = await request({
         url: "/team-admin/add-team-member",
         method: "POST",
@@ -34,7 +35,7 @@ const AddTeamMember = ({ isOpen, onClose }: AddUserProps) => {
       });
 
       if (result.data.success) {
-        alert("用户创建成功");
+        alert("用户创建成功，并成功发送邮件");
         onClose(); // 关闭模态框
       } else {
         alert(result.data.message || "用户创建失败");
@@ -42,6 +43,8 @@ const AddTeamMember = ({ isOpen, onClose }: AddUserProps) => {
     } catch (error) {
       console.error("创建用户时发生错误:", error);
       alert("用户创建时发生错误");
+    }finally {
+      setLoading(false); // 完成后设置loading为false
     }
   };
 
@@ -68,19 +71,6 @@ const AddTeamMember = ({ isOpen, onClose }: AddUserProps) => {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium">密码</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="请输入密码"
-            />
-          </div>
-
-          <div>
             <label className="block text-gray-700 font-medium">邮箱</label>
             <input
               type="email"
@@ -98,7 +88,7 @@ const AddTeamMember = ({ isOpen, onClose }: AddUserProps) => {
               type="submit"
               className="bg-purple-300 text-white px-6 py-2 rounded-md hover:bg-blue-600"
             >
-              提交
+              {loading ? '发送中...' : '提交'}
             </button>
             <button
               type="button"
