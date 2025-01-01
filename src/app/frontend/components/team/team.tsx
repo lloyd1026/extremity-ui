@@ -7,6 +7,13 @@ import config from "@/config/baseurl_config"
 
 const { Title, Text } = Typography
 
+interface TeamInfo {
+  teamId: number;
+  teamName: string;
+  description: string;
+  researchField: string;
+}
+
 interface TeamUserDetails {
   userId: number;
   position: string;
@@ -27,10 +34,14 @@ export default function Example() {
   const [teamUsers, setTeamUsers] = useState<TeamUserDetails[]>([])
   const [selectedUser, setSelectedUser] = useState<TeamUser | null>(null) // 用于存储点击的用户信息
 
+  const [teamInfo, setTeamInfo] = useState<TeamInfo | null>(null); // 团队信息
+  const [isLoading, setLoading] = useState(false); // 加载状态
+  const [error, setError] = useState<string | null>(null); // 错误信息
+
   // Fetch users from team-admin
   const fetchUser = async () => {
     try {
-      const response = await request.get(`/team-admin/get-activated-team-members`)
+      const response = await request.get(`/user/get-activated-team-members`)
       if (response.data.success) {
         setUsers(response.data.data)
       }
@@ -51,10 +62,32 @@ export default function Example() {
     }
   }
 
+  // Fetch team information
+  const fetchTeamInfo = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await request.get(`/user/show-info`, {
+        params: { teamId: "1" },
+      });
+      if (response.data.success) {
+        setTeamInfo(response.data.data);
+      } else {
+        setError("获取团队信息失败");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("无法加载团队信息");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch data on component mount
   useEffect(() => {
     fetchUser();
     fetchTeamUser();
+    fetchTeamInfo();
   }, [])
 
   // 点击卡片时显示详细信息
@@ -76,12 +109,13 @@ export default function Example() {
         {/* 左侧文本描述区域 */}
         <Col xs={24} lg={8}>
           <div>
-            <Title level={2} style={{ fontWeight: 'bold' }}>西伯利亚泰坦巨龙</Title>
+            <Title level={2} style={{ fontWeight: 'bold' }}>{teamInfo?.teamName}</Title>
             <Text style={{ fontSize: '16px', lineHeight: '1.8', color: '#666' }}>
-            我们组专注于开发和研究前沿的人工智能技术，致力于推动深度学习和计算机视觉领域的创新与应用。凭借在图像识别、目标检测、自然语言处理等多个领域的显著成果，我们在学术界和工业界均取得了广泛认可。团队成员包括来自世界顶尖学府的专家，拥有丰富的科研经验和技术背景，致力于开发具有高效性、可扩展性和应用价值的AI解决方案。
+            {teamInfo?.description}
             </Text>
           </div>
         </Col>
+        
 
         {/* 右侧两列用户卡片区域 */}
         <Col xs={24} lg={16}>

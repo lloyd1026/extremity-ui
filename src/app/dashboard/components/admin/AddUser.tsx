@@ -9,9 +9,8 @@ interface AddUserProps {
 }
 
 const AddUser = ({ isOpen, onClose }: AddUserProps) => {
+  const [loading, setLoading] = useState(false); // 控制loading状态
   const [formData, setFormData] = useState({
-    account: "",
-    password: "",
     email: "",
   });
 
@@ -24,6 +23,7 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
     e.preventDefault();
 
     try {
+      setLoading(true); // 设置loading为true，开始加载
       const result = await request({
         url: "/admin/user/add-user",
         method: "POST",
@@ -42,6 +42,8 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
     } catch (error) {
       console.error("创建用户时发生错误:", error);
       alert("用户创建时发生错误");
+    }finally {
+      setLoading(false); // 完成后设置loading为false
     }
   };
 
@@ -54,31 +56,6 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
       <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-h-[90vh] overflow-y-auto">
         <h3 className="text-xl font-semibold mb-4">创建新用户</h3>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-gray-700 font-medium">账号</label>
-            <input
-              type="text"
-              name="account"
-              value={formData.account}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="请输入账号"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium">密码</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="请输入密码"
-            />
-          </div>
 
           <div>
             <label className="block text-gray-700 font-medium">邮箱</label>
@@ -98,7 +75,7 @@ const AddUser = ({ isOpen, onClose }: AddUserProps) => {
               type="submit"
               className="bg-purple-300 text-white px-6 py-2 rounded-md hover:bg-blue-600"
             >
-              提交
+              {loading ? '发送中...' : '提交'}
             </button>
             <button
               type="button"
