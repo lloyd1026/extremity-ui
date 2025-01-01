@@ -61,7 +61,7 @@ const AdmittedStatus = () => {
             <div className="mt-4">
               <p className="text-sm text-gray-500">您的申请状态为:</p>
               <p className="text-lg font-semibold text-indigo-600">
-                {status === 1 ? '已通过' : status === -1 ? '未通过' : '审核中'}
+              {status === 1 ? '已通过' : status === 0 ? '审核中' : '未通过'}
               </p>
             </div>
           )}
