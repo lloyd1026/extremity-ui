@@ -111,7 +111,7 @@ const NormalUsersActivatedPage = () => {
 
     return (
         <div>
-          <h1 className="text-3xl font-bold text-center mb-6">普通用户申请列表</h1>
+          <h1 className="text-3xl font-bold text-center mb-6">普通用户列表</h1>
           {/* 用户列表 */}
           <div className="space-y-4">
             {currentPageData.map((user) => (

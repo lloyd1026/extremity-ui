@@ -78,16 +78,12 @@ const NormalUsersPendingPage = () => {
         router.push(`/dashboard/team-admin/users/${userId}`); // 跳转到用户详情页
     };
 
-    const toggleActivationStatus = async (
+    const handleAccept = async (
         userId: number,
         roleId: number,
-        isActivated: number
       ) => {
         try {
-          const endpoint =
-            isActivated === 0
-              ? "team-admin/activate-role"
-              : "team-admin/deactivate-role";
+          const endpoint = "team-admin/activate-role";
     
           const result = await request.get(endpoint, {
             params: { idUser: userId, idRole: roleId },
@@ -166,6 +162,7 @@ const NormalUsersPendingPage = () => {
 
     return (
         <div>
+          <h1 className="text-3xl font-bold text-center mb-6">普通用户申请列表</h1>
           {/* 用户列表 */}
           <div className="space-y-4">
             {currentPageData.map((user) => (
@@ -187,23 +184,22 @@ const NormalUsersPendingPage = () => {
                   <p className="text-sm text-gray-800">
                     <strong>昵称:</strong> {user.nickName}
                   </p>
-                  {/* 仅对待审核用户显示申请时间 */}
+
                   {user.activated === 0 && (
                       <p className="text-sm text-gray-600 mt-2">
                       <strong>申请时间:</strong> {formatTimestamp(user.createdTime)}
                       </p>
                   )}
-                  {/* 仅对待审核用户显示悬浮弹窗 */}
-                  {user.activated === 0 && (
-                    <div className="absolute top-full left-0 w-full mt-2 p-2 bg-gray-50 border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                      <p className="text-sm text-gray-800">
-                        <strong>邮箱:</strong> {user.email}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <strong>申请理由：</strong> {user.message || "暂无理由"}
-                      </p>
-                    </div>
-                  )}
+
+                  <div className="absolute top-full left-0 w-full mt-2 p-2 bg-gray-50 border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    <p className="text-sm text-gray-800">
+                      <strong>邮箱:</strong> {user.email}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>申请理由：</strong> {user.message || "暂无理由"}
+                    </p>
+                  </div>
+                  
                 </div>
     
                 {/* 状态和操作按钮 */}
@@ -212,7 +208,7 @@ const NormalUsersPendingPage = () => {
                     {user.roleName}
                   </span>
                   <span className="px-2 py-1 text-sm rounded-full bg-green-100 text-green-800">
-                    {user.activated === 0 ? "申请中" : "已通过"}
+                    {"申请中"}
                   </span>
     
                   {user.activated === 0 && (
@@ -221,7 +217,7 @@ const NormalUsersPendingPage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // 阻止事件冒泡，避免点击按钮时触发跳转
-                          toggleActivationStatus(user.idUser, user.idRole, user.activated); // 执行通过逻辑
+                          handleAccept(user.idUser, user.idRole); // 执行通过逻辑
                         }}
                         className="px-3 py-1 text-sm rounded-md bg-green-500 text-white hover:bg-green-600"
                       >

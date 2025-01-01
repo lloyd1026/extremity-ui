@@ -81,14 +81,10 @@ const TeamUsersPendingPage = () => {
     const handleAccept = async (
         userId: number,
         roleId: number,
-        isActivated: number
       ) => {
         try {
-          const endpoint =
-            isActivated === 0
-              ? "team-admin/activate-role"
-              : "team-admin/deactivate-role";
-    
+          const endpoint = "team-admin/activate-role";
+             
           const result = await request.get(endpoint, {
             params: { idUser: userId, idRole: roleId },
             headers: {
@@ -166,6 +162,7 @@ const TeamUsersPendingPage = () => {
 
     return (
         <div>
+          <h1 className="text-3xl font-bold text-center mb-6">团队成员申请列表</h1>
           {/* 用户列表 */}
           <div className="space-y-4">
             {currentPageData.map((user) => (
@@ -212,7 +209,7 @@ const TeamUsersPendingPage = () => {
                     {user.roleName}
                   </span>
                   <span className="px-2 py-1 text-sm rounded-full bg-green-100 text-green-800">
-                    {user.activated === 0 ? "申请中" : "已通过"}
+                    {"申请中"}
                   </span>
     
                   {user.activated === 0 && (
@@ -221,7 +218,7 @@ const TeamUsersPendingPage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // 阻止事件冒泡，避免点击按钮时触发跳转
-                          handleAccept(user.idUser, user.idRole, user.activated); // 执行通过逻辑
+                          handleAccept(user.idUser, user.idRole); // 执行通过逻辑
                         }}
                         className="px-3 py-1 text-sm rounded-md bg-green-500 text-white hover:bg-green-600"
                       >
