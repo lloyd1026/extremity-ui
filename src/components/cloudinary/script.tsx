@@ -14,13 +14,15 @@ const Script = ({ src, onError, onLoad }: LoadScriptProps) => {
 
     script.async = true;
     script.src = src;
-
+    // @ts-ignore
     script.addEventListener('load', onLoad);
+    // @ts-ignore
     script.addEventListener('error', onError);
 
     document.body.appendChild(script);
 
     return () => {
+      // @ts-ignore
       script.removeEventListener('load', onLoad);
       script.removeEventListener('error', onError!);
       document.body.removeChild(script);

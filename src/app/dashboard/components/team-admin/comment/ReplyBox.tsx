@@ -15,7 +15,7 @@ interface ReplyItemProps {
     onSubmitReply: (parentId: number, rootCommentId: number, replyId: number, content: string) => void;
 }
 
-const ReplyItem: React.FC<ReplyItemProps> = ({ reply, user, parentAccount, onReply, onSubmitReply }) => {
+const ReplyItem: React.FC<ReplyItemProps> = ({ reply, user, parentAccount, onSubmitReply }) => {
     const [showReplyForm, setShowReplyForm] = useState<boolean>(false);
     const { auth } = useAuth() as { auth: userwithRoles };
 

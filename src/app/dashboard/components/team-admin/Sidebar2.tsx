@@ -12,7 +12,7 @@ interface SidebarProps {
 
 const Sidebar2 = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const pathname = usePathname(); // 获取当前路径
-  const [currentPermissions,setCurrentPermissions] = useState([])
+  const [currentPermissions,setCurrentPermissions] = useState<number[]>([]);
   // 用于判断当前路径
   const getNavLinkClass = (path: string) => {
     return pathname === path

@@ -454,6 +454,7 @@ export default function Content({ id }: { id: string }) {
                 {coverFile ? (
                   <div style={{ marginBottom: 8 }}>
                     <img
+                      // @ts-ignore
                       src={coverUrl || null}
                       alt="预览封面"
                       style={{ maxWidth: "100%", maxHeight: 200, marginBottom: 8 }}

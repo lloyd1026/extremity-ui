@@ -19,11 +19,11 @@ const Card: React.FC<CardProps> = ({ title, imageUrl, tag, date, description, li
         className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden flex transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
       >
         {/* 图片部分，图片在左边 */}
-        <div className="relative w-1/3 h-full">
+        <div className="relative w-1/3 h-full ">
           <img
             src={imageUrl}
             alt={title}
-            className="w-full h-full object-cover rounded-l-lg"
+            className="w-full h-[200px] object-cover rounded-l-lg"
           />
           <span className="absolute top-2 left-3 text-xs uppercase text-white bg-black bg-opacity-50 px-2 py-1 rounded-md">
             {tag}

@@ -12,6 +12,15 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
+type PostType = {
+  avatarUrl?: string;
+  articleThumbnailUrl?: string;
+  articleTitle?: string;
+  userName?: string;
+  finalShowTime?: string;
+  articleContent?: string;
+};
+
 const PreviewPage = () => {
   const params = useParams(); // Access params as a Promise
   const articleId = params.id; // Access id directly from params
@@ -22,7 +31,7 @@ const PreviewPage = () => {
     }
   }, [articleId, router]);
 
-  const [ post, setPost] = useState(null);
+  const [ post, setPost] = useState<PostType | null>(null);
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const [tocItemActive, setTocItemActive] = useState<string | null>(null);
   const [showProgress, setShowProgress] = useState(false);
@@ -33,9 +42,9 @@ const PreviewPage = () => {
 
   const handleItemClick = (e: any, id: string) => {
     e.preventDefault();
-    const editor = editorRef.current.getEditor();
+    const editor = editorRef.current!.getEditor();
     const element = editor.view.dom.querySelector(`[id="${id}"]`);
-    const elementTop = element.getBoundingClientRect().top + window.scrollY;
+    const elementTop = element!.getBoundingClientRect().top + window.scrollY;
     const offset = window.innerHeight * 0.05;
 
     window.scrollTo({
@@ -55,10 +64,10 @@ const PreviewPage = () => {
 
   const calculateReadingProgress = () => {
     const element = contentRef.current;
-    const elementRect = element.getBoundingClientRect();
+    const elementRect = element!.getBoundingClientRect();
     const progress = Math.min(
       (Math.abs(elementRect.top) /
-        (element.offsetHeight - window.innerHeight)) *
+        (element!.offsetHeight - window.innerHeight)) *
         100,
       100
     );
@@ -249,7 +258,7 @@ const PreviewPage = () => {
       <div className='mx-auto mt-12 max-w-[50rem] xl:grid xl:max-w-none xl:grid-cols-[50rem_1fr] xl:items-start xl:gap-x-20'>
         <div className='flex flex-col'>
           <div className='aspect-video relative mb-10 rounded-lg overflow-hidden'>
-            <Image src={getThumbUrl()} fill alt={post.articleTitle} />
+            <Image src={getThumbUrl()} fill alt={post.articleTitle!} />
           </div>
           <article ref={contentRef}>
             <Editor
@@ -272,7 +281,7 @@ const PreviewPage = () => {
           <TableOfContent
             items={tocItems}
             onItemClick={handleItemClick}
-            activeItemId={tocItemActive}
+            activeItemId={tocItemActive!}
           />
         </aside>
       </div>

@@ -72,6 +72,11 @@ const UserList = () => {
 
   // 删除
   const handleDelete = async (userId: number) => {
+    const isConfirmed = window.confirm("确认要删除此用户吗？此操作不可撤销！");
+    if (!isConfirmed) {
+      // 如果用户选择取消，则不执行删除
+      return;
+    }
     try {
       // 调用删除用户 API
       const response = await request.get("admin/user/delete-user", {

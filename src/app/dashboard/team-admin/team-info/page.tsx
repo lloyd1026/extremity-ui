@@ -121,107 +121,112 @@ const TeamInfoPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center p-6 space-y-6 bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-3xl shadow-lg border border-gray-200">
-      <h1 className="text-3xl font-extrabold mb-4 text-purple-600">团队信息</h1>
+    <div className="flex flex-col items-center p-6 space-y-6  rounded-3xl shadow-lg border border-gray-200">
+      <h1 className="text-3xl font-extrabold ">团队信息</h1>
 
-      {isLoading ? (
-        <p className="text-gray-500">加载中...</p>
-      ) : error ? (
-        <p className="text-red-600">{error}</p>
-      ) : teamInfo ? (
-        <>
-          <div className="space-y-4 w-full">
-            <p className="text-lg font-medium text-gray-700">
-              <strong className="text-purple-500">团队 ID：</strong> {teamInfo.teamId}
-            </p>
-            <p className="text-lg font-medium text-gray-700">
-              <strong className="text-purple-500">团队名称：</strong> {teamInfo.teamName}
-            </p>
-            <p className="text-lg font-medium text-gray-700">
-              <strong className="text-purple-500">描述：</strong> {teamInfo.description}
-            </p>
-            <p className="text-lg font-medium text-gray-700">
-              <strong className="text-purple-500">研究领域：</strong> {teamInfo.researchField}
-            </p>
-          </div>
-          <button
-            onClick={toggleModal}
-            className="mt-4 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-          >
-            编辑信息
-          </button>
-
-          {isModalOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="w-1/2 bg-gray-200 p-6 rounded-2xl">
-                <h2 className="text-2xl font-bold mb-4 text-purple-600">编辑团队信息</h2>
-                <form onSubmit={saveTeamInfo}>
-                  <label className="block mb-2">团队名称</label>
-                  <input
-                    name="teamName"
-                    value={formData?.teamName || ""}
-                    onChange={handleInputChange}
-                    className="w-full mb-4 p-2 border rounded"
-                  />
-                  <label className="block mb-2">描述</label>
-                  <textarea
-                    name="description"
-                    value={formData?.description || ""}
-                    onChange={handleInputChange}
-                    className="w-full mb-4 p-2 border rounded"
-                  />
-                  <label className="block mb-2">研究领域</label>
-                  <input
-                    name="researchField"
-                    value={formData?.researchField || ""}
-                    onChange={handleInputChange}
-                    className="w-full mb-4 p-2 border rounded"
-                  />
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      type="button"
-                      onClick={toggleModal}
-                      className="px-4 py-2 bg-gray-400 rounded"
-                    >
-                      取消
-                    </button>
-                    <button type="submit" className="px-4 py-2 bg-purple-500 text-white rounded">
-                      保存
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <p className="text-gray-500">未找到团队信息</p>
-      )}
-
-      <div className="w-full mt-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">团队成员</h2>
-        <div className="space-y-4 ">
-          {teamMembers.map((user) => (
-            <div
-              key={user.idUser}
-              onClick={() => router.push(`/dashboard/team-admin/users/${user.idUser}`)}
-              className="flex items-center p-4 border border-gray-300 rounded shadow hover:shadow-lg hover:scale-105 transition-all rounded-lg"
-            >
-              <Image
-                src={user.avatarUrl ? `${config.imageUrl}${user.avatarUrl}` : "/images/default-avatar.jpg"}
-                alt="用户头像"
-                width={50}
-                height={50}
-                className="rounded-full"
-              />
-              <div className="ml-4">
-                <p className="font-medium text-gray-700">{user.nickName}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-2xl font-semibold text-gray-800 text-center">
+          <strong>团队名称：</strong> {teamInfo?.teamName}
+        </p>
+        <button
+          onClick={toggleModal}
+          className="ml-4 px-6 py-3 bg-purple-300 text-white rounded-lg shadow-md hover:bg-purple-700 transition duration-200"
+        >
+          编辑信息
+        </button>
       </div>
+
+      <div className="flex space-x-6">
+       {/* 左侧：团队信息 */}
+        <div className="w-2/5 space-y-6 relative">
+          {teamInfo ? (
+            <>
+              {/* Research Field above description */}
+              <p className="text-lg font-medium text-gray-700">
+                <strong>研究领域：</strong> {teamInfo.researchField}
+              </p>
+
+              {/* Description with background */}
+              <div>
+                <p className="text-lg font-medium ">
+                  <strong>描述：</strong> {teamInfo.description}
+                </p>
+              </div>
+            </>
+          ) : (
+            <p className="text-gray-500">未找到团队信息</p>
+          )}
+        </div>
+
+        {/* 右侧：成员列表 */}
+        <div className="w-3/5 space-y-4">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">团队成员</h2>
+          <div className="grid grid-cols-4 gap-4 overflow-x-auto">
+            {teamMembers.map((user) => (
+              <div
+                key={user.idUser}
+                onClick={() => router.push(`/dashboard/team-admin/users/${user.idUser}`)}
+                className="flex flex-col items-center p-4 hover:shadow-lg hover:scale-105 transition-all"
+              >
+                <Image
+                  src={user.avatarUrl ? `${config.imageUrl}${user.avatarUrl}` : "/images/default-avatar.jpg"}
+                  alt="用户头像"
+                  width={50}
+                  height={50}
+                  className="rounded-full"
+                />
+                <div className="mt-4 text-center">
+                  <p className="font-medium text-gray-700">{user.nickName}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="w-1/2 bg-gray-200 p-6 rounded-2xl">
+            <h2 className="text-2xl font-bold mb-4 text-purple-600">编辑团队信息</h2>
+            <form onSubmit={saveTeamInfo}>
+              <label className="block mb-2">团队名称</label>
+              <input
+                name="teamName"
+                value={formData?.teamName || ""}
+                onChange={handleInputChange}
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <label className="block mb-2">描述</label>
+              <textarea
+                name="description"
+                value={formData?.description || ""}
+                onChange={handleInputChange}
+                className="w-full mb-4 p-2 border rounded h-64"
+              />
+              <label className="block mb-2">研究领域</label>
+              <input
+                name="researchField"
+                value={formData?.researchField || ""}
+                onChange={handleInputChange}
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={toggleModal}
+                  className="px-4 py-2 bg-gray-400 rounded"
+                >
+                  取消
+                </button>
+                <button type="submit" className="px-4 py-2 bg-purple-500 text-white rounded">
+                  保存
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

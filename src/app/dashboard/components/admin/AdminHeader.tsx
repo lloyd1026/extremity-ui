@@ -1,5 +1,6 @@
 "use client";
-import { FaRegEnvelope, FaCog } from 'react-icons/fa'; // 导入你需要的图标
+// import { FaRegEnvelope, FaCog } from 'react-icons/fa'; // 导入你需要的图标
+import { FaCog } from 'react-icons/fa'; // 导入你需要的图标
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react'; // 用于控制下拉菜单显示
@@ -51,17 +52,17 @@ const UserHeader = ({ isSidebarOpen }: AdminHeaderProps) => {
       {/* 用户头像和按钮都放在右侧 */}
       <div className="flex items-center space-x-6">
         {/* 消息 */}
-        <Link
+        {/* <Link
           href="messages"
           className="flex items-center space-x-2 p-2 rounded-lg hover:bg-indigo-200 hover:text-indigo-600 transition-colors"
         >
-          <FaRegEnvelope size={20} /> {/* 消息图标 */}
+          <FaRegEnvelope size={20} /> 
           <span>消息</span>
-        </Link>
+        </Link> */}
 
         {/* 设置 */}
         <Link
-          href="settings"
+          href="/dashboard/personal-settings"
           className="flex items-center space-x-2 p-2 rounded-lg hover:bg-indigo-200 hover:text-indigo-600 transition-colors"
         >
           <FaCog size={20} /> {/* 设置图标 */}

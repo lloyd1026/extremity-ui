@@ -17,8 +17,11 @@ const MediaLibrary = ({
   onOpen,
   options = {}
 }: MediaLibraryProps) => {
+  // @ts-ignore
   const cloudinary: any = useRef();
+  // @ts-ignore
   const widget: any = useRef();
+  // @ts-ignore
   const widgetContainerRef: any = useRef();
 
   const [isScriptLoading, setIsScriptLoading] = useState(true);

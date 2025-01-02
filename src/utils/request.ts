@@ -14,7 +14,7 @@ function saveRefreshToken(token:string):void {
 
 const instance = axios.create({
   baseURL: 'http://localhost:8080/extremity/api/',  // 设置请求的基础 URL
-  timeout: 10000,  // 设置请求超时时间
+  timeout: 30000,  // 设置请求超时时间 30s
 });
 
 // 请求拦截器

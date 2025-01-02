@@ -2,6 +2,7 @@ export type UploadWidgetInstance = any;
 export type CloudinaryInstance = any;
 
 export interface UploadWidgetProps {
+  // @ts-ignore
   children?: (options: UploadWidgetPropsChildren) => JSX.Element;
   onError?: UploadWidgetEventCallbackError;
   onSuccess?: UploadWidgetEventCallback;

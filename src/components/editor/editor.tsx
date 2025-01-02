@@ -57,6 +57,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(
     );
 
     useImperativeHandle(ref, () => ({
+      // @ts-ignore
       getEditor: () => editor
     }));
 

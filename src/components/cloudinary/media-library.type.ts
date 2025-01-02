@@ -33,6 +33,7 @@ export interface MediaLibraryOptions {
 }
 
 export interface MediaLibraryProps {
+  // @ts-ignore
   children?: (options: MediaLibraryCallbackOptions) => JSX.Element;
   onClose?: Function;
   onInsert?: Function;

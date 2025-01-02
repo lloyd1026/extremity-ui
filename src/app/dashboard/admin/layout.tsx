@@ -1,6 +1,6 @@
 "use client"; // 客户端渲染
 
-import { ReactNode, useState, useEffect} from 'react';
+import { ReactNode, useState } from 'react';
 import Sidebar from '@/app/dashboard/components/admin/Sidebar';
 import UserHeader from '@/app/dashboard/components/admin/AdminHeader';
 import PrivateRoute from '../components/auth/privateroute';

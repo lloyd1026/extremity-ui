@@ -6,7 +6,6 @@ import Card from "./ariticleCard";
 import { Article as ArticleType } from "@/app/frontend/components/info";
 import moment from 'moment'; // 用于处理日期
 import config from "@/config/baseurl_config";
-
 interface ArticleProps {
   categoryId: number;  // 只接收 categoryId 参数
 }
