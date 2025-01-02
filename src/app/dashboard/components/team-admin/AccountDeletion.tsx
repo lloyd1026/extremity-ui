@@ -32,7 +32,7 @@ const AccountDeletionModal = ({ isOpen, onClose }: AccountDeletionModalProps) =>
         setError('无法加载用户数据');
       }
     } catch (error) {
-      setError('网络错误');
+      setError('网络错误，' + error);
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ const AccountDeletionModal = ({ isOpen, onClose }: AccountDeletionModalProps) =>
         alert('操作失败');
       }
     } catch (error) {
-      alert('网络错误');
+      alert('网络错误, ' + error);
     }
   };
 

@@ -1,7 +1,7 @@
 // src/components/UserAvatar.tsx
 import React from 'react';
 import config from "@/config/baseurl_config";
-import { User } from "../info";
+import { User } from "@/app/frontend/components/info";
 
 interface UserAvatarProps {
     user: User;

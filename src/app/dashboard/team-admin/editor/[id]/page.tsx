@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 export default function ArticlePage() {
   const router = useRouter();
   const params = useParams(); // Access params as a Promise
-  const articleId = params.id; // Access id directly from params
+  const articleId = params.id as string; // Access id directly from params
 
   useEffect(() => {
     if (isNaN(Number(articleId))) {

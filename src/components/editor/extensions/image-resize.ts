@@ -52,6 +52,7 @@ export default BaseImage.extend({
   },
 
   addNodeView() {
+    // @ts-ignore
     return ReactNodeViewRenderer(ResizeImage);
   }
 });
