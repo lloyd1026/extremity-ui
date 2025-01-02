@@ -11,8 +11,10 @@ import CommentItem from './CommentItem';
 import CommentForm from './CommentBox';
 
 const PAGE_SIZE = 5; // 每页显示五条顶级评论
-
-const CommentSection: React.FC = () => {
+interface CommentSectionProps {
+    articleId: number;
+  }
+const CommentSection: React.FC <CommentSectionProps> = ({ articleId }) => {
     const [topComments, setTopComments] = useState<commentDetails[]>([]);
     const [replys, setReplys] = useState<{ [key: number]: commentDetails[] }>({});
     const [userDetails, setUserDetails] = useState<{ [key: number]: User }>({});
@@ -58,7 +60,7 @@ const CommentSection: React.FC = () => {
     // Fetch top-level comments
     const fetchTopComment = async () => {
         try {
-            const response = await request.get<{ success: boolean; data: commentDetails[] }>(`/comment/articleId`);
+            const response = await request.get(`/comment/articleId`,{params:{articleId:articleId}});
             if (response.data.success) {
                 const comments: commentDetails[] = response.data.data;
                 setTopComments(comments);
@@ -87,7 +89,7 @@ const CommentSection: React.FC = () => {
         }
 
         try {
-            const response = await request.get<{ success: boolean; data: commentDetails[] }>(`/comment/commentId`, { params: { commentId: id } });
+            const response = await request.get<{ success: boolean; data: commentDetails[] }>(`/comment/commentId`, { params: { commentId: id ,articleId:articleId} });
             if (response.data.success) {
                 const replies = response.data.data as commentDetails[];
                 

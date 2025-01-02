@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-
+import Comment from '@/app/frontend/components/comment/comment'
 type PostType = {
   avatarUrl?: string;
   articleThumbnailUrl?: string;
@@ -286,6 +286,7 @@ const PreviewPage = () => {
         </aside>
       </div>
     </div>
+    <Comment articleId={articleId}/>
     </>
   );
 };
