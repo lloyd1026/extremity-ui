@@ -90,7 +90,7 @@ const Article: React.FC<ArticleProps> = ({ categoryId }) => {
           <Card
             key={article.idArticle}
             title={article.articleTitle}
-            imageUrl={config.baseUrl+ article.articleThumbnailUrl||"/images/bg/bg3.jpg"}
+           imageUrl={config.baseUrl+ article.articleThumbnailUrl||"/images/bg/bg3.jpg"}
             tag={article.articleTags}
             date={moment(article.updatedTime).format("YYYY-MM-DD")}
             description={article.articlePreviewContent}
