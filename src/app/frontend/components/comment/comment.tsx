@@ -123,6 +123,7 @@ const CommentSection: React.FC <CommentSectionProps> = ({ articleId }) => {
                 rootCommentId: rootCommentId === 0 ? parentId : rootCommentId,
                 createdAt: formatDate(new Date()),
                 updatedAt: formatDate(new Date()),
+                articleId: articleId
             };
             const response = await request.post(`/comment/add`, comment);
 
@@ -163,6 +164,7 @@ const CommentSection: React.FC <CommentSectionProps> = ({ articleId }) => {
                 rootCommentId: 0,
                 createdAt: formatDate(new Date()),
                 updatedAt: formatDate(new Date()),
+                articleId: articleId
             };
     
             const response = await request.post(`/comment/add`, comment);

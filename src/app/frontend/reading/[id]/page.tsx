@@ -286,6 +286,7 @@ const PreviewPage = () => {
         </aside>
       </div>
     </div>
+    {/* @ts-ignore */}
     <Comment articleId={articleId}/>
     </>
   );

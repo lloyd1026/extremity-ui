@@ -19,6 +19,7 @@ export interface commentDetails{
     rootCommentId:number;
     createdAt:string;
     updatedAt:string;
+    articleId:number;
 }
 
 export const formatDate = (date: Date) => {

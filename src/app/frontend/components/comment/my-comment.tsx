@@ -121,6 +121,7 @@ const MyComment: React.FC = () => {
                 rootCommentId: rootCommentId === 0 ? parentId : rootCommentId,
                 createdAt: formatDate(new Date()),
                 updatedAt: formatDate(new Date()),
+                articleId: 0
             };
             const response = await request.post(`/comment/add`, comment);
 
