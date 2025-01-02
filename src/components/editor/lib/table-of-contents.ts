@@ -70,7 +70,7 @@ function fillEmpty(headings: any[]) {
 
 function createTree(headings: any[], depth: number) {
   fillEmpty(headings);
-
+  // @ts-ignore
   const tree = new TOC('', '', null);
   let current = tree;
 
@@ -86,8 +86,10 @@ function flatten(toc: ToCObject, depth: number): TocItem[] {
   const items = [];
 
   for (const item of toc.children) {
+    // @ts-ignore
     if (item.level > depth) return;
     const { children, ...rest } = item;
+    // @ts-ignore
     items.push(rest, ...flatten(item, depth));
   }
 

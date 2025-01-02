@@ -50,7 +50,7 @@ const LinkBubble = ({ editor }: LinkBubbleProps) => {
   );
 
   const onUnsetLink = useCallback(() => {
-    let transaction = editor.chain().focus();
+    const transaction = editor.chain().focus();
     if (pos) {
       transaction.setTextSelection(pos);
       setPos({ from: -1, to: -1 });

@@ -11,6 +11,16 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
+interface Post {
+  avatarUrl?: string;
+  articleTitle: string;
+  userName: string;
+  updatedTime: string;
+  articleThumbnailUrl?: string;
+  articleContent: string;
+}
+
+
 const PreviewPage = () => {
   const params = useParams(); // Access params as a Promise
   const articleId = params.id; // Access id directly from params
@@ -22,7 +32,7 @@ const PreviewPage = () => {
     }
   }, [articleId, router]);
 
-  const [ post, setPost] = useState(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const [tocItemActive, setTocItemActive] = useState<string | null>(null);
   const [showProgress, setShowProgress] = useState(false);
@@ -32,10 +42,10 @@ const PreviewPage = () => {
 
   const handleItemClick = (e: any, id: string) => {
     e.preventDefault();
-    const editor = editorRef.current.getEditor();
+    const editor = editorRef.current!.getEditor();
     const element = editor.view.dom.querySelector(`[id="${id}"]`);
 
-    const elementTop = element.getBoundingClientRect().top + window.scrollY;
+    const elementTop = element!.getBoundingClientRect().top + window.scrollY;
     const offset = window.innerHeight * 0.05;
 
     window.scrollTo({
@@ -55,10 +65,10 @@ const PreviewPage = () => {
 
   const calculateReadingProgress = () => {
     const element = contentRef.current;
-    const elementRect = element.getBoundingClientRect();
+    const elementRect = element!.getBoundingClientRect();
     const progress = Math.min(
       (Math.abs(elementRect.top) /
-        (element.offsetHeight - window.innerHeight)) *
+        (element!.offsetHeight - window.innerHeight)) *
         100,
       100
     );
@@ -270,7 +280,7 @@ const PreviewPage = () => {
           <TableOfContent
             items={tocItems}
             onItemClick={handleItemClick}
-            activeItemId={tocItemActive}
+            activeItemId={tocItemActive!}
           />
         </aside>
       </div>

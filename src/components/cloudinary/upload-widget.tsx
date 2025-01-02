@@ -9,7 +9,9 @@ import {
 } from './upload-widget.type';
 
 const UploadWidget = ({ children, onSuccess, onError }: UploadWidgetProps) => {
+  // @ts-ignore
   const cloudinary = useRef<CloudinaryInstance>();
+  // @ts-ignore
   const widget = useRef<UploadWidgetInstance>();
 
   const [isScriptLoading, setIsScriptLoading] = useState(true);

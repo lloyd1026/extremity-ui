@@ -180,6 +180,7 @@ function AttachmentManager({ draftId, canModify = true }) { // 添加 canModify 
         <Upload
           name="file"
           beforeUpload={beforeUpload}
+          // @ts-ignore
           customRequest={customUpload}
           showUploadList={false} // 不使用 antd 默认列表渲染
         >

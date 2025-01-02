@@ -192,7 +192,7 @@ const Sidebar = () => {
         <Link
           href={`/dashboard/team-admin/editor/${article.idArticle}`}
           className="flex-1 block px-2 py-1 text-sm rounded hover:bg-gray-100"
-          onDoubleClick={() => handleEditStart(article.idArticle)}
+          onDoubleClick={() => handleEditStart(article.idArticle!)}
         >
           {article.articleTitle || "无标题"}
         </Link>
@@ -217,7 +217,7 @@ const Sidebar = () => {
           <button
             className="invisible group-hover:visible text-gray-400 hover:text-red-400 px-1"
             title="删除文章"
-            onClick={() => handleDeleteArticle(item.idArticle)}
+            onClick={() => handleDeleteArticle(item.idArticle!)}
           >
             ×
           </button>

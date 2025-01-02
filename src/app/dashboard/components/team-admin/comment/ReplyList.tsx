@@ -1,6 +1,6 @@
 // src/components/ReplyList.tsx
 import React from 'react';
-import { commentDetails, User } from "../info";
+import { commentDetails, User } from "@/app/frontend/components/info";
 import ReplyItem from './ReplyBox';
 
 interface ReplyListProps {
