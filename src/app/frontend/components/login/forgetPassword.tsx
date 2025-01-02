@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import request from "@/utils/request";
-
+interface forgetPasswordDetail{
+  password:string;
+  code:string;
+}
 const forgetPassword = () => {
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -12,7 +15,15 @@ const forgetPassword = () => {
   const handleForget = async (e: React.FormEvent) => {
     e.preventDefault(); // 防止表单提交
     console.log(code)
-    // 如果有验证码，可以继续注册逻辑
+    const forgetPassword:forgetPasswordDetail={
+      password:password,
+      code:code
+    }
+    const response = await request.patch(`auth/forget-password`,forgetPassword)
+    if(response.data.ok){
+      alert("修改成功")
+      router.push('/frontend/login')
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
