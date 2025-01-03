@@ -8,12 +8,12 @@ interface ReplyListProps {
     users: { [key: number]: User };
     commentMap: { [key: number]: commentDetails };
     onReply: (parentId: number, rootCommentId: number) => void;
-    onSubmitReply: (parentId: number, rootCommentId: number, replyId: number, content: string) => void;
+    onSubmitReply: (parentId: number, rootCommentId: number, replyId: number, content: string, articleId: number) => void;
 }
 
 const ReplyList: React.FC<ReplyListProps> = ({ replies, users, commentMap, onReply, onSubmitReply }) => {
     return (
-        <div style={{ marginLeft: "20px", marginTop: "10px" }}>
+        <div style={{ marginLeft: "20px", marginTop: "10px"}}>
             {replies.map((reply) => {
                 const parentComment = reply.parentId ? commentMap[reply.parentId] : null;
                 const parentAccount = parentComment ? (users[parentComment.userId]?.account || "Anonymous") : "";

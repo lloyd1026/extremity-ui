@@ -16,8 +16,8 @@ const TeamPermissionsManage = () => {
     // 使用 currentPath 拼接目标路径
     const targetPath = `${currentPath}${tab}`;
 
-    console.log("当前页面的路径：" + currentPath);
-    console.log("目标跳转路径：" + targetPath);
+    // console.log("当前页面的路径：" + currentPath);
+    // console.log("目标跳转路径：" + targetPath);
 
     // 在新标签页打开目标路径
     window.open(targetPath, tabName);

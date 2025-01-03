@@ -17,6 +17,7 @@ const forgetPassword = () => {
     console.log(code)
     const forgetPassword:forgetPasswordDetail={
       password:password,
+      //@ts-ignore
       code:code
     }
     const response = await request.patch(`auth/forget-password`,forgetPassword)

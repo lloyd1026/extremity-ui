@@ -25,6 +25,12 @@ const PreviewPage = () => {
   const params = useParams(); // Access params as a Promise
   const articleId = params.id; // Access id directly from params
   const router = useRouter();
+  const [isVisible, setIsVisible] = useState(true);
+
+  const toggleVisibility = () => {
+    setIsVisible((prev) => !prev);
+  };
+
   useEffect(() => {
     if (isNaN(Number(articleId))) {
       router.push("/404");
@@ -254,6 +260,7 @@ const PreviewPage = () => {
           </div>
         </div>
       </div>
+      
 
       <div className='mx-auto mt-12 max-w-[50rem] xl:grid xl:max-w-none xl:grid-cols-[50rem_1fr] xl:items-start xl:gap-x-20'>
         <div className='flex flex-col'>
@@ -285,9 +292,25 @@ const PreviewPage = () => {
           />
         </aside>
       </div>
+
     </div>
-    {/* @ts-ignore */}
-    <Comment articleId={articleId}/>
+
+    <div>
+      <button
+        onClick={toggleVisibility}
+        className="fixed bottom-4 left-4 bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md"
+      >
+        {isVisible ? '隐藏评论' : '显示评论'}
+      </button>
+
+      {isVisible && (
+        <div className="fixed bottom-16 left-4 w-[1000px] p-4 border">
+          {/* @ts-ignore */}
+          <Comment articleId={articleId} />
+        </div>
+      )}
+    </div>
+    
     </>
   );
 };

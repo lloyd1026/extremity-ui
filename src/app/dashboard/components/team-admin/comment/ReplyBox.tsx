@@ -12,7 +12,7 @@ interface ReplyItemProps {
     user: User;
     parentAccount?: string;
     onReply: (parentId: number, rootCommentId: number) => void;
-    onSubmitReply: (parentId: number, rootCommentId: number, replyId: number, content: string) => void;
+    onSubmitReply: (parentId: number, rootCommentId: number, replyId: number, content: string, articleId: number) => void;
 }
 
 const ReplyItem: React.FC<ReplyItemProps> = ({ reply, user, parentAccount, onSubmitReply }) => {
@@ -20,12 +20,12 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, user, parentAccount, onSub
     const { auth } = useAuth() as { auth: userwithRoles };
 
     const handleReply = (content: string) => {
-        onSubmitReply(reply.id, reply.rootCommentId, reply.id, content);
+        onSubmitReply(reply.id, reply.rootCommentId, reply.id, content, reply.articleId);
         setShowReplyForm(false);
     };
 
     return (
-        <div className="mb-4 p-4 bg-gray-100 border border-gray-300 rounded-md shadow-sm">
+        <div className="mb-4 p-4 bg-gray-100 border border-gray-100 rounded-3xl shadow-sm">
             {/* Reply Header */}
             <div className="flex items-start mb-2">
                 <UserAvatar user={user} size={30} />

@@ -1,4 +1,3 @@
-// src/components/CommentItem.tsx
 import React, { useEffect, useState } from 'react';
 import { commentDetails, User, formatTimestamp } from "@/app/frontend/components/info";
 import UserAvatar from './UserAvatar';
@@ -15,7 +14,7 @@ interface CommentItemProps {
     commentMap: { [key: number]: commentDetails };
     onToggleReplies: (commentId: number) => void;
     onSetReplyingTo: (commentId: number | null) => void;
-    onSubmitReply: (parentId: number, rootCommentId: number, replyId: number, content: string) => void;
+    onSubmitReply: (parentId: number, rootCommentId: number, replyId: number, content: string, articleId: number) => void;
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
@@ -31,14 +30,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
     const [isReplying, setIsReplying] = useState<boolean>(false);
     const { auth } = useAuth() as { auth: userwithRoles };
     const handleReply = (content: string) => {
-        onSubmitReply(comment.id, comment.rootCommentId, comment.id, content);
+        onSubmitReply(comment.id, comment.rootCommentId, comment.id, content, comment.articleId);
         setIsReplying(false);
     };
     useEffect(()=>{
         console.log(auth)
     },[auth])
     return (
-        <div className="mb-5 border border-gray-300 p-4 rounded-md bg-white shadow-sm">
+        <div className="mb-5 border border-gray-300 p-4 rounded-3xl shadow-sm">
             {/* Comment Header */}
             <div className="flex items-start mb-2">
                 <UserAvatar user={user} />
@@ -75,7 +74,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             </div>
             {/* Reply Form */}
             {isReplying && (
-                <div className="mt-4">
+                <div className="mt-4 ">
                     <CommentForm
                         onSubmit={handleReply}
                         onCancel={() => setIsReplying(false)}

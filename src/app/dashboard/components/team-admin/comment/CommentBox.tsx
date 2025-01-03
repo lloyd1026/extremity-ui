@@ -21,12 +21,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ onSubmit, placeholder = "è¾“å
     };
 
     return (
-        <div style={{ marginTop: "10px" }}>
+        <div style={{ marginTop: "10px"}}>
             <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={3}
-                style={{ width: "100%", padding: "5px" }}
+                style={{ width: "100%", padding: "5px", borderRadius: "16px"}}
                 placeholder={placeholder}
             />
             <div>
