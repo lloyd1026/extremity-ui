@@ -87,7 +87,7 @@ const MyComment: React.FC = () => {
         }
 
         try {
-            const response = await request.get<{ success: boolean; data: commentDetails[] }>(`/comment/commentId`, { params: { commentId: id } });
+            const response = await request.get<{ success: boolean; data: commentDetails[] }>(`/comment/commentId/id`, { params: { commentId: id } });
             if (response.data.success) {
                 const replies = response.data.data as commentDetails[];
                 
